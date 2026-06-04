@@ -126,7 +126,7 @@
     .confetti-piece { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: fall linear forwards; }
 
     /* Celebration modal */
-    .celebration-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .celebration-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
     .celebration-modal { background: var(--primary, #6c3483); border-radius: 24px; padding: 40px 32px; text-align: center; max-width: 320px; width: 90%; animation: popIn 0.4s; }
     .celebration-modal h2 { font-size: 1.8rem; margin-bottom: 12px; }
     .celebration-stars { font-size: 3rem; margin: 12px 0; }
@@ -449,9 +449,15 @@
 
     function loadProgress() {
       try {
-        const d = JSON.parse(localStorage.getItem('englishApp_v1') || '{}');
-        state.progress = d.progress || {};
-      } catch(e) { state.progress = {}; }
+        const saved = localStorage.getItem('englishApp_v1');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.progress) state.progress = parsed.progress;
+        }
+      } catch(e) {
+        console.warn('Progress load failed, starting fresh', e);
+        localStorage.removeItem('englishApp_v1');
+      }
     }
 
     function saveProgress() {
@@ -465,6 +471,30 @@
     }
 
     // ===================== CONFETTI =====================
+
+    function showCelebrationModal(stars, score, total) {
+      const starStr = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+      const msgs = {
+        3: 'מעולה! אתה כוכב! 🌟',
+        2: 'יפה מאוד! כמעט מושלם! 🎉',
+        1: 'כל הכבוד! המשך להתאמן! 💪',
+        0: 'נסה שוב — אתה יכול! 😊'
+      };
+      const msg = msgs[stars] || msgs[0];
+
+      const overlay = document.createElement('div');
+      overlay.className = 'celebration-overlay';
+      overlay.setAttribute('data-action', 'closeCelebration');
+      overlay.innerHTML = `
+        <div class="celebration-modal" onclick="event.stopPropagation()">
+          <h2>סיימת! 🎊</h2>
+          <div class="celebration-stars">${starStr}</div>
+          <p class="celebration-msg">${msg}</p>
+          <p style="color:rgba(255,255,255,0.6);margin-bottom:16px;font-size:0.95rem">${score} / ${total} תשובות נכונות</p>
+          <button class="btn btn-primary" style="width:100%" onclick="this.closest('.celebration-overlay').remove()">המשך ✨</button>
+        </div>`;
+      document.getElementById('app').appendChild(overlay);
+    }
 
     function showConfetti() {
       const container = document.createElement('div');
@@ -866,6 +896,7 @@
       switch(action) {
         case 'setLevel':
           state.level = data.level;
+          document.body.className = 'theme-' + state.level;
           render();
           break;
 
@@ -1048,6 +1079,7 @@
           updateProgress(state.unitId, 'quizDone', true);
           updateProgress(state.unitId, 'stars', stars);
           if (stars > 0) setTimeout(showConfetti, 300);
+          setTimeout(() => showCelebrationModal(stars, state.quizScore, state.quizQuestions.length), 600);
         }
         render();
       }, 900);
@@ -1087,6 +1119,7 @@
           updateProgress(state.unitId, 'quizDone', true);
           updateProgress(state.unitId, 'stars', stars);
           if (stars > 0) setTimeout(showConfetti, 300);
+          setTimeout(() => showCelebrationModal(stars, state.readingScore, allQs.length), 600);
         }
         render();
       }, 900);
@@ -1095,6 +1128,7 @@
     // ===================== INIT =====================
 
     loadProgress();
+    document.body.className = 'theme-' + state.level;
     render();
 
     document.getElementById('app').addEventListener('click', e => {
