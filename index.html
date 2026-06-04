@@ -1,1142 +1,791 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>לומדים אנגלית! 🌟</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; background: var(--bg, #1a0030); color: #fff; }
-    #app { max-width: 640px; margin: 0 auto; min-height: 100vh; padding: 0 12px 80px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>לומדים אנגלית! 🌟</title>
+<!-- PWA + iOS Support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="אנגלית 🌟">
+<meta name="theme-color" content="#4a1060">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234a1060'/><text y='.9em' font-size='80' x='10'>🌟</text></svg>">
 
-    /* Themes */
-    .theme-beginner { --bg:#4a1060; --primary:#7b2d8b; --accent:#9c4dcc; --btn:#6c3483; }
-    .theme-advanced { --bg:#4a0a1a; --primary:#6b1a3a; --accent:#8b2252; --btn:#7b1a3a; }
-
-    /* Buttons */
-    .btn { padding: 12px 20px; border: none; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: all 0.2s; }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-secondary { background: rgba(255,255,255,0.15); color: #fff; }
-    .btn-active { background: #fff; color: var(--primary); }
-
-    /* Home */
-    .home-header { text-align: center; padding: 24px 0 16px; }
-    .home-header h1 { font-size: 2rem; }
-    .level-toggle { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
-    .alphabet-btn-wrap { text-align: center; margin: 12px 0; }
-    .units-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
-    .unit-card { background: rgba(255,255,255,0.1); border-radius: 16px; padding: 16px 12px; cursor: pointer; text-align: center; transition: all 0.2s; position: relative; }
-    .unit-card:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
-    .unit-emoji { font-size: 2.5rem; }
-    .unit-title { font-size: 0.9rem; font-weight: bold; margin: 8px 0 4px; }
-    .unit-stars { font-size: 1.1rem; margin: 4px 0; }
-    .unit-progress { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
-    .unit-progress-fill { height: 100%; background: #ffd700; border-radius: 3px; transition: width 0.3s; }
-    .unit-check { position: absolute; top: 8px; left: 8px; color: #4caf50; font-size: 1.2rem; font-weight: bold; }
-    .total-stars-bar { text-align: center; padding: 16px; font-size: 1.1rem; }
-    .reset-btn-wrap { text-align: center; padding: 8px; }
-    .reset-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; }
-    .reset-btn:hover { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.4); }
-
-    /* Unit screen */
-    .unit-header { display: flex; align-items: center; padding: 16px 0; gap: 12px; }
-    .unit-header h2 { font-size: 1.3rem; flex: 1; }
-    .back-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 1rem; }
-    .tab-bar { display: flex; gap: 6px; margin-bottom: 16px; }
-    .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; background: rgba(255,255,255,0.1); color: #fff; transition: all 0.2s; }
-    .tab-btn.active { background: #fff; color: var(--primary, #6c3483); }
-
-    /* Flashcard */
-    .flashcard { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 24px; text-align: center; }
-    .card-emoji { font-size: 4rem; margin-bottom: 12px; }
-    .card-en { font-size: 2rem; font-weight: bold; direction: ltr; margin-bottom: 4px; }
-    .card-translit { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 12px; direction: ltr; }
-    .card-he { font-size: 1.5rem; color: #ffd700; margin: 12px 0; animation: fadeIn 0.3s; }
-    .flip-btn { background: var(--accent); color: #fff; border: none; padding: 10px 24px; border-radius: 12px; cursor: pointer; font-size: 1rem; margin: 8px 0; }
-    .speak-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 1.2rem; }
-    .nav-row { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
-    .nav-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 1.2rem; }
-    .nav-btn:disabled { opacity: 0.3; cursor: default; }
-    .dots { display: flex; gap: 6px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); }
-    .dot.active { background: #ffd700; }
-
-    /* Match game */
-    .match-question { text-align: center; padding: 16px; }
-    .match-prompt { font-size: 2.5rem; margin-bottom: 8px; }
-    .match-he { font-size: 1.3rem; color: #ffd700; margin-bottom: 16px; direction: rtl; }
-    .match-en { font-size: 1.3rem; margin-bottom: 16px; direction: ltr; }
-    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .option-btn { padding: 14px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.1); color: #fff; cursor: pointer; font-size: 1rem; font-weight: bold; direction: ltr; transition: all 0.2s; }
-    .option-btn:hover { background: rgba(255,255,255,0.2); }
-    .option-btn.correct { background: #4caf50 !important; border-color: #4caf50 !important; animation: pulse 0.3s; }
-    .option-btn.wrong { background: #f44336 !important; border-color: #f44336 !important; animation: shake 0.3s; }
-    .match-score { text-align: center; padding: 8px; color: rgba(255,255,255,0.7); }
-    .match-progress { text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-
-    /* Quiz */
-    .quiz-word-display { text-align: center; padding: 20px; }
-    .quiz-word { font-size: 2.5rem; font-weight: bold; direction: ltr; letter-spacing: 8px; margin: 12px 0; }
-    .quiz-prompt-he { font-size: 1.3rem; color: #ffd700; direction: rtl; margin: 8px 0; }
-    .quiz-letters { direction: ltr; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
-    .letter-option { background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); color: #fff; width: 60px; height: 60px; border-radius: 12px; font-size: 1.8rem; font-weight: bold; cursor: pointer; direction: ltr; transition: all 0.2s; }
-    .letter-option:hover { background: rgba(255,255,255,0.25); }
-    .letter-option.correct { background: #4caf50; border-color: #4caf50; }
-    .letter-option.wrong { background: #f44336; border-color: #f44336; animation: shake 0.3s; }
-    .quiz-sentence-options { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
-    .quiz-sentence-opt { padding: 12px 16px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.1); color: #fff; cursor: pointer; font-size: 0.95rem; text-align: right; transition: all 0.2s; }
-    .quiz-sentence-opt[dir='ltr'] { text-align: left; }
-    .quiz-sentence-opt.correct { background: #4caf50 !important; border-color: #4caf50 !important; }
-    .quiz-sentence-opt.wrong { background: #f44336 !important; border-color: #f44336 !important; animation: shake 0.3s; }
-
-    /* Results */
-    .results-screen { text-align: center; padding: 32px 16px; animation: popIn 0.4s; }
-    .result-stars { font-size: 3rem; margin: 16px 0; }
-    .result-score { font-size: 1.3rem; margin: 8px 0; }
-    .result-message { font-size: 1.1rem; color: rgba(255,255,255,0.8); margin: 8px 0; }
-    .result-btns { display: flex; gap: 10px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
-
-    /* Alphabet */
-    .alphabet-header { display: flex; align-items: center; padding: 16px 0; gap: 12px; }
-    .alphabet-header h2 { font-size: 1.3rem; }
-    .alphabet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-    .letter-card { background: rgba(255,255,255,0.1); border-radius: 14px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s; }
-    .letter-card:hover { background: rgba(255,255,255,0.2); }
-    .letter-card.vowel { background: rgba(255,215,0,0.2); border: 2px solid rgba(255,215,0,0.4); }
-    .letter-card.vowel:hover { background: rgba(255,215,0,0.3); }
-    .letter-card.pulse-anim { animation: pulse 0.4s; }
-    .big-letter { font-size: 1.8rem; font-weight: bold; direction: ltr; color: #ffd700; }
-    .letter-emoji { font-size: 1.5rem; margin: 4px 0; }
-    .letter-word { font-size: 0.8rem; direction: ltr; color: rgba(255,255,255,0.9); }
-    .letter-translit { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
-
-    /* Reading */
-    .reading-passage { background: rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
-    .reading-title { font-size: 1.3rem; font-weight: bold; direction: ltr; margin-bottom: 12px; color: #ffd700; }
-    .reading-text { direction: ltr; line-height: 1.8; font-size: 1rem; color: rgba(255,255,255,0.9); }
-    .reading-question { font-size: 1.1rem; margin-bottom: 16px; }
-    .passage-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-    .passage-btn { padding: 8px 14px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; cursor: pointer; font-size: 0.85rem; }
-    .passage-btn.active { border-color: #ffd700; color: #ffd700; }
-
-    /* Confetti */
-    .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
-    .confetti-piece { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: fall linear forwards; }
-
-    /* Celebration modal */
-    .celebration-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-    .celebration-modal { background: var(--primary, #6c3483); border-radius: 24px; padding: 40px 32px; text-align: center; max-width: 320px; width: 90%; animation: popIn 0.4s; }
-    .celebration-modal h2 { font-size: 1.8rem; margin-bottom: 12px; }
-    .celebration-stars { font-size: 3rem; margin: 12px 0; }
-    .celebration-msg { font-size: 1.1rem; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
-
-    /* Animations */
-    @keyframes fall { from { top: -20px; opacity: 1; } to { top: 110vh; opacity: 0; } }
-    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
-    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
-    @keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  </style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;min-height:100vh;background:#1a0030;color:#fff}
+#app{max-width:640px;margin:0 auto;min-height:100vh;padding:0 12px 60px}
+.btn{padding:11px 18px;border:none;border-radius:11px;cursor:pointer;font-size:.95rem;font-weight:700;transition:all .2s}
+.btn-primary{background:var(--accent,#9c4dcc);color:#fff}
+.btn-secondary{background:rgba(255,255,255,.15);color:#fff}
+.btn-white{background:#fff;color:var(--primary,#6c3483)}
+.theme-b{--bg:#3d0a5a;--primary:#6c3483;--accent:#9c4dcc}
+.theme-a{--bg:#3d0a1a;--primary:#7b1a3a;--accent:#a02050}
+/* HOME */
+.home{padding:16px 0;background:var(--bg,#1a0030);min-height:100vh}
+.home h1{text-align:center;font-size:1.9rem;padding:16px 0 8px}
+.lvl-toggle{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}
+.lvl-btn{padding:10px 20px;border:2px solid rgba(255,255,255,.3);border-radius:12px;background:transparent;color:rgba(255,255,255,.6);cursor:pointer;font-size:.9rem;font-weight:700;transition:all .2s}
+.lvl-btn.active{background:#fff;color:var(--primary,#6c3483);border-color:#fff}
+.abc-btn{display:block;margin:8px auto 16px;padding:10px 28px;background:rgba(255,255,255,.15);border:none;border-radius:12px;color:#fff;font-size:1rem;cursor:pointer}
+.units-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:11px}
+.ucard{background:rgba(255,255,255,.1);border-radius:16px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .2s;position:relative}
+.ucard:hover{background:rgba(255,255,255,.2);transform:translateY(-2px)}
+.ucard-emoji{font-size:2.4rem}
+.ucard-title{font-size:.85rem;font-weight:700;margin:6px 0 3px}
+.ucard-stars{color:#ffd700;font-size:1rem;letter-spacing:1px}
+.ubar{height:5px;background:rgba(255,255,255,.15);border-radius:3px;margin-top:6px;overflow:hidden}
+.ubar-fill{height:100%;background:#ffd700;border-radius:3px;transition:width .3s}
+.ucheck{position:absolute;top:7px;left:7px;color:#4caf50;font-size:1.1rem;font-weight:700}
+.total-bar{text-align:center;padding:14px;font-size:1rem;color:rgba(255,255,255,.8)}
+.reset-wrap{text-align:center;padding:6px}
+.reset-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.35);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.78rem}
+.reset-btn:hover{color:rgba(255,255,255,.6);border-color:rgba(255,255,255,.4)}
+/* UNIT */
+.unit-wrap{padding:12px 0;min-height:100vh;background:var(--bg,#1a0030)}
+.unit-hdr{display:flex;align-items:center;gap:10px;padding:12px 0}
+.unit-hdr h2{flex:1;font-size:1.2rem}
+.back-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 13px;border-radius:10px;cursor:pointer;font-size:.95rem}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{flex:1;padding:9px 4px;border:none;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:700;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);transition:all .2s}
+.tab.active{background:#fff;color:var(--primary,#6c3483)}
+/* LEARN */
+.fcard{background:rgba(255,255,255,.1);border-radius:18px;padding:22px 16px;text-align:center}
+.fc-emoji{font-size:3.8rem;margin-bottom:10px}
+.fc-en{font-size:2rem;font-weight:700;direction:ltr;margin-bottom:3px}
+.fc-tr{font-size:.88rem;color:rgba(255,255,255,.55);direction:ltr;margin-bottom:10px}
+.fc-he{font-size:1.5rem;color:#ffd700;margin:10px 0;animation:fadeIn .3s}
+.flip-btn{background:var(--accent,#9c4dcc);color:#fff;border:none;padding:9px 22px;border-radius:11px;cursor:pointer;font-size:.95rem;margin:6px 0}
+.speak-btn{background:rgba(255,255,255,.13);border:none;color:#fff;padding:7px 14px;border-radius:9px;cursor:pointer;font-size:1.1rem}
+.nav-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.nav-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 15px;border-radius:9px;cursor:pointer;font-size:1.1rem}
+.nav-btn:disabled{opacity:.25;cursor:default}
+.dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:200px}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}
+.dot.on{background:#ffd700}
+/* MATCH */
+.match-wrap{text-align:center}
+.match-prog{font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:8px}
+.match-prompt{font-size:2.8rem;margin-bottom:6px}
+.match-lbl{font-size:1.2rem;color:#ffd700;margin-bottom:14px;min-height:1.6em}
+.match-lbl-en{font-size:1.2rem;direction:ltr;margin-bottom:14px;min-height:1.6em}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.opt-btn{padding:13px 8px;border:2px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.95rem;font-weight:700;transition:all .15s}
+.opt-btn:hover:not(:disabled){background:rgba(255,255,255,.2)}
+.opt-btn.correct{background:#388e3c!important;border-color:#388e3c!important}
+.opt-btn.wrong{background:#c62828!important;border-color:#c62828!important;animation:shake .3s}
+/* QUIZ */
+.quiz-wrap{text-align:center}
+.quiz-prog{font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:8px}
+.quiz-prompt-he{font-size:1.2rem;color:#ffd700;margin-bottom:10px;min-height:1.6em}
+.quiz-word{font-size:2.2rem;font-weight:700;direction:ltr;letter-spacing:6px;margin:10px 0 16px}
+.quiz-letters{direction:ltr;display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.lopt{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);color:#fff;width:58px;height:58px;border-radius:12px;font-size:1.7rem;font-weight:700;cursor:pointer;direction:ltr;transition:all .15s}
+.lopt:hover:not(:disabled){background:rgba(255,255,255,.25)}
+.lopt.correct{background:#388e3c!important;border-color:#388e3c!important}
+.lopt.wrong{background:#c62828!important;border-color:#c62828!important;animation:shake .3s}
+.sent-opts{display:grid;grid-template-columns:1fr;gap:9px;margin-top:10px}
+.sopt{padding:12px 14px;border:2px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.92rem;text-align:right;transition:all .15s}
+.sopt[dir=ltr]{text-align:left}
+.sopt:hover:not(:disabled){background:rgba(255,255,255,.2)}
+.sopt.correct{background:#388e3c!important;border-color:#388e3c!important}
+.sopt.wrong{background:#c62828!important;border-color:#c62828!important;animation:shake .3s}
+/* RESULTS */
+.results{text-align:center;padding:28px 12px;animation:popIn .4s}
+.res-stars{font-size:3rem;color:#ffd700;margin:14px 0}
+.res-score{font-size:1.2rem;margin:6px 0}
+.res-msg{font-size:1rem;color:rgba(255,255,255,.75);margin:6px 0 20px}
+.res-btns{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+/* ALPHABET */
+.alpha-hdr{display:flex;align-items:center;gap:10px;padding:14px 0}
+.alpha-hdr h2{font-size:1.2rem}
+.alpha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:9px}
+.lcard{background:rgba(255,255,255,.1);border-radius:13px;padding:10px 7px;text-align:center;cursor:pointer;transition:all .2s}
+.lcard:hover{background:rgba(255,255,255,.2)}
+.lcard.vowel{background:rgba(255,215,0,.15);border:1.5px solid rgba(255,215,0,.35)}
+.lcard.vowel:hover{background:rgba(255,215,0,.25)}
+.lcard.pulsing{animation:pulse .35s}
+.big-l{font-size:1.75rem;font-weight:700;direction:ltr;color:#ffd700}
+.l-emoji{font-size:1.4rem;margin:3px 0}
+.l-word{font-size:.76rem;direction:ltr;color:rgba(255,255,255,.9)}
+.l-tr{font-size:.7rem;color:rgba(255,255,255,.55);margin-top:2px}
+/* READING */
+.reading-passages{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.psg-btn{padding:7px 13px;border:1.5px solid rgba(255,255,255,.2);border-radius:9px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);cursor:pointer;font-size:.82rem}
+.psg-btn.active{border-color:#ffd700;color:#ffd700}
+.psg-box{background:rgba(255,255,255,.1);border-radius:15px;padding:18px;margin-bottom:16px}
+.psg-title{font-size:1.1rem;font-weight:700;direction:ltr;color:#ffd700;margin-bottom:10px}
+.psg-text{direction:ltr;line-height:1.8;font-size:.95rem;color:rgba(255,255,255,.9)}
+.rq-prompt{font-size:1.05rem;margin-bottom:12px;font-weight:700}
+.rq-opts{display:grid;gap:9px}
+.ropt{padding:12px 14px;border:2px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.92rem;direction:ltr;text-align:left;transition:all .15s}
+.ropt:hover:not(:disabled){background:rgba(255,255,255,.2)}
+.ropt.correct{background:#388e3c!important;border-color:#388e3c!important}
+.ropt.wrong{background:#c62828!important;border-color:#c62828!important;animation:shake .3s}
+/* CONFETTI */
+.cbox{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
+.cp{position:absolute;width:9px;height:9px;border-radius:2px;animation:fall linear forwards}
+/* ANIMATIONS */
+@keyframes fall{from{top:-15px;opacity:1}to{top:105vh;opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
 </head>
 <body>
-  <div id="app"></div>
-  <script>
-    // ===================== DATA =====================
+<div id="app"></div>
+<script>
+// ============ DATA ============
+const beginnerUnits=[
+  {id:'animals',title:'בעלי חיים',emoji:'🐾',mode:'heToEn',words:[
+    {en:'Cat',he:'חתול',t:'קאט',e:'🐱'},{en:'Dog',he:'כלב',t:'דוג',e:'🐕'},
+    {en:'Bird',he:'ציפור',t:'בורד',e:'🐦'},{en:'Fish',he:'דג',t:'פיש',e:'🐟'},
+    {en:'Rabbit',he:'ארנב',t:'ראביט',e:'🐰'},{en:'Horse',he:'סוס',t:'הורס',e:'🐴'},
+    {en:'Cow',he:'פרה',t:'קאו',e:'🐄'},{en:'Elephant',he:'פיל',t:'אלפנט',e:'🐘'},
+    {en:'Lion',he:'אריה',t:'לאיון',e:'🦁'},{en:'Duck',he:'ברווז',t:'דאק',e:'🦆'}
+  ]},
+  {id:'colors',title:'צבעים',emoji:'🎨',mode:'heToEn',words:[
+    {en:'Red',he:'אדום',t:'רד',e:'🔴'},{en:'Blue',he:'כחול',t:'בלו',e:'🔵'},
+    {en:'Green',he:'ירוק',t:'גרין',e:'💚'},{en:'Yellow',he:'צהוב',t:'ילו',e:'💛'},
+    {en:'Orange',he:'כתום',t:"אורנג'",e:'🟠'},{en:'Purple',he:'סגול',t:'פורפל',e:'💜'},
+    {en:'Pink',he:'ורוד',t:'פינק',e:'🩷'},{en:'Black',he:'שחור',t:'בלאק',e:'⚫'},
+    {en:'White',he:'לבן',t:'וויט',e:'⚪'},{en:'Brown',he:'חום',t:'בראון',e:'🟤'}
+  ]},
+  {id:'numbers',title:'מספרים',emoji:'🔢',mode:'heToEn',words:[
+    {en:'One',he:'אחד',t:'וואן',e:'1️⃣'},{en:'Two',he:'שניים',t:'טו',e:'2️⃣'},
+    {en:'Three',he:'שלוש',t:'תרי',e:'3️⃣'},{en:'Four',he:'ארבע',t:'פור',e:'4️⃣'},
+    {en:'Five',he:'חמש',t:'פייב',e:'5️⃣'},{en:'Six',he:'שש',t:'סיקס',e:'6️⃣'},
+    {en:'Seven',he:'שבע',t:'סבן',e:'7️⃣'},{en:'Eight',he:'שמונה',t:'אייט',e:'8️⃣'},
+    {en:'Nine',he:'תשע',t:'נאיין',e:'9️⃣'},{en:'Ten',he:'עשר',t:'טן',e:'🔟'}
+  ]},
+  {id:'food',title:'אוכל',emoji:'🍎',mode:'heToEn',words:[
+    {en:'Apple',he:'תפוח',t:'אפּל',e:'🍎'},{en:'Bread',he:'לחם',t:'ברד',e:'🍞'},
+    {en:'Milk',he:'חלב',t:'מילק',e:'🥛'},{en:'Egg',he:'ביצה',t:'אג',e:'🥚'},
+    {en:'Cheese',he:'גבינה',t:"צ'יז",e:'🧀'},{en:'Pizza',he:'פיצה',t:'פיצה',e:'🍕'},
+    {en:'Cake',he:'עוגה',t:'קייק',e:'🎂'},{en:'Water',he:'מים',t:'ווטר',e:'💧'},
+    {en:'Juice',he:'מיץ',t:"ג'וס",e:'🧃'},{en:'Banana',he:'בננה',t:'בנאנה',e:'🍌'}
+  ]},
+  {id:'body',title:'חלקי גוף',emoji:'🧑',mode:'heToEn',words:[
+    {en:'Head',he:'ראש',t:'הד',e:'🗣️'},{en:'Eye',he:'עין',t:'אאי',e:'👁️'},
+    {en:'Nose',he:'אף',t:'נוז',e:'👃'},{en:'Mouth',he:'פה',t:'מאות',e:'👄'},
+    {en:'Ear',he:'אוזן',t:'איר',e:'👂'},{en:'Hand',he:'יד',t:'האנד',e:'✋'},
+    {en:'Foot',he:'רגל',t:'פוט',e:'🦶'},{en:'Hair',he:'שיער',t:'הר',e:'💇'},
+    {en:'Tooth',he:'שן',t:'טות',e:'🦷'},{en:'Leg',he:'שוק',t:'לג',e:'🦵'}
+  ]},
+  {id:'family',title:'משפחה',emoji:'👨‍👩‍👧‍👦',mode:'heToEn',words:[
+    {en:'Mother',he:'אמא',t:'מאדר',e:'👩'},{en:'Father',he:'אבא',t:'פאדר',e:'👨'},
+    {en:'Sister',he:'אחות',t:'סיסטר',e:'👧'},{en:'Brother',he:'אח',t:'ברדר',e:'👦'},
+    {en:'Baby',he:'תינוק',t:'בייבי',e:'👶'},{en:'Grandmother',he:'סבתא',t:'גרנדמאדר',e:'👵'},
+    {en:'Grandfather',he:'סבא',t:'גרנדפאדר',e:'👴'},{en:'Family',he:'משפחה',t:'פמילי',e:'👨‍👩‍👧‍👦'},
+    {en:'Son',he:'בן',t:'סאן',e:'🧒'},{en:'Daughter',he:'בת',t:'דוטר',e:'👧'}
+  ]},
+  {id:'school',title:'בית ספר',emoji:'🏫',mode:'heToEn',words:[
+    {en:'Book',he:'ספר',t:'בוק',e:'📚'},{en:'Pen',he:'עט',t:'פן',e:'✏️'},
+    {en:'Teacher',he:'מורה',t:"טיצ'ר",e:'👩‍🏫'},{en:'Student',he:'תלמיד',t:'סטיודנט',e:'🧑‍🎓'},
+    {en:'Desk',he:'שולחן',t:'דסק',e:'🪑'},{en:'Bag',he:'תיק',t:'באג',e:'🎒'},
+    {en:'Class',he:'כיתה',t:'קלאס',e:'🏫'},{en:'Board',he:'לוח',t:'בורד',e:'📋'},
+    {en:'Ruler',he:'סרגל',t:'רולר',e:'📏'},{en:'Eraser',he:'מחק',t:'ארייסר',e:'🧹'}
+  ]},
+  {id:'clothes',title:'בגדים',emoji:'👕',mode:'heToEn',words:[
+    {en:'Shirt',he:'חולצה',t:'שורט',e:'👕'},{en:'Pants',he:'מכנסיים',t:'פנטס',e:'👖'},
+    {en:'Shoes',he:'נעליים',t:'שוז',e:'👟'},{en:'Hat',he:'כובע',t:'האט',e:'🎩'},
+    {en:'Dress',he:'שמלה',t:'דרס',e:'👗'},{en:'Socks',he:'גרביים',t:'סוקס',e:'🧦'},
+    {en:'Jacket',he:'מעיל',t:"ג'קט",e:'🧥'},{en:'Gloves',he:'כפפות',t:'גלובס',e:'🧤'},
+    {en:'Scarf',he:'צעיף',t:'סקארף',e:'🧣'},{en:'Boots',he:'מגפיים',t:'בוטס',e:'👢'}
+  ]},
+  {id:'shapes',title:'צורות',emoji:'🔷',mode:'heToEn',words:[
+    {en:'Circle',he:'עיגול',t:'סורקל',e:'⭕'},{en:'Square',he:'ריבוע',t:'סקווייר',e:'🟦'},
+    {en:'Triangle',he:'משולש',t:'טריאנגל',e:'🔺'},{en:'Star',he:'כוכב',t:'סטאר',e:'⭐'},
+    {en:'Heart',he:'לב',t:'הארט',e:'❤️'},{en:'Rectangle',he:'מלבן',t:'רקטנגל',e:'🔲'},
+    {en:'Oval',he:'אליפסה',t:'אובל',e:'🥚'},{en:'Diamond',he:'מעוין',t:'דיימנד',e:'💎'},
+    {en:'Arrow',he:'חץ',t:'ארו',e:'➡️'},{en:'Cross',he:'צלב',t:'קרוס',e:'✚'}
+  ]},
+  {id:'transport',title:'כלי תחבורה',emoji:'🚗',mode:'heToEn',words:[
+    {en:'Car',he:'מכונית',t:'קאר',e:'🚗'},{en:'Bus',he:'אוטובוס',t:'באס',e:'🚌'},
+    {en:'Train',he:'רכבת',t:'טריין',e:'🚂'},{en:'Plane',he:'מטוס',t:'פליין',e:'✈️'},
+    {en:'Boat',he:'סירה',t:'בוט',e:'⛵'},{en:'Bicycle',he:'אופניים',t:'בייסיקל',e:'🚲'},
+    {en:'Motorcycle',he:'אופנוע',t:'מוטורסייקל',e:'🏍️'},{en:'Truck',he:'משאית',t:'טראק',e:'🚛'},
+    {en:'Helicopter',he:'מסוק',t:'הליקופטר',e:'🚁'},{en:'Rocket',he:'רקטה',t:'רוקט',e:'🚀'}
+  ]},
+  {id:'nature',title:'הטבע',emoji:'🌿',mode:'heToEn',words:[
+    {en:'Sun',he:'שמש',t:'סאן',e:'☀️'},{en:'Moon',he:'ירח',t:'מון',e:'🌙'},
+    {en:'Star',he:'כוכב',t:'סטאר',e:'⭐'},{en:'Rain',he:'גשם',t:'ריין',e:'🌧️'},
+    {en:'Snow',he:'שלג',t:'סנו',e:'❄️'},{en:'Tree',he:'עץ',t:'טרי',e:'🌳'},
+    {en:'Flower',he:'פרח',t:'פלאור',e:'🌸'},{en:'Mountain',he:'הר',t:'מאונטן',e:'⛰️'},
+    {en:'Sea',he:'ים',t:'סי',e:'🌊'},{en:'Cloud',he:'ענן',t:'קלאוד',e:'☁️'}
+  ]},
+  {id:'sentences_b',title:'משפטים פשוטים',emoji:'💬',mode:'sentences',words:[
+    {en:'Hello! My name is...',he:'שלום! שמי הוא...',t:'',e:'👋'},
+    {en:'How are you?',he:'מה שלומך?',t:'',e:'😊'},
+    {en:'I am fine, thank you.',he:'אני בסדר, תודה.',t:'',e:'😄'},
+    {en:'What is your name?',he:'מה שמך?',t:'',e:'🤔'},
+    {en:'I like cats.',he:'אני אוהב חתולים.',t:'',e:'🐱'},
+    {en:'I am hungry.',he:'אני רעב.',t:'',e:'🍽️'},
+    {en:'Good morning!',he:'בוקר טוב!',t:'',e:'🌅'},
+    {en:'Good night!',he:'לילה טוב!',t:'',e:'🌙'},
+    {en:'I love you.',he:'אני אוהב אותך.',t:'',e:'❤️'},
+    {en:'See you later!',he:'להתראות!',t:'',e:'👋'}
+  ]}
+];
 
-    const beginnerUnits = [
-      { id:'animals', title:'בעלי חיים', emoji:'🐾', mode:'heToEn', words:[
-        {en:'Cat',he:'חתול',t:'קאט',e:'🐱'},{en:'Dog',he:'כלב',t:'דוג',e:'🐕'},
-        {en:'Bird',he:'ציפור',t:'בורד',e:'🐦'},{en:'Fish',he:'דג',t:'פיש',e:'🐟'},
-        {en:'Rabbit',he:'ארנב',t:'ראביט',e:'🐰'},{en:'Horse',he:'סוס',t:'הורס',e:'🐴'},
-        {en:'Cow',he:'פרה',t:'קאו',e:'🐄'},{en:'Elephant',he:'פיל',t:'אלפנט',e:'🐘'},
-        {en:'Lion',he:'אריה',t:'לאיון',e:'🦁'},{en:'Duck',he:'ברווז',t:'דאק',e:'🦆'}
-      ]},
-      { id:'colors', title:'צבעים', emoji:'🎨', mode:'heToEn', words:[
-        {en:'Red',he:'אדום',t:'רד',e:'🔴'},{en:'Blue',he:'כחול',t:'בלו',e:'🔵'},
-        {en:'Green',he:'ירוק',t:'גרין',e:'💚'},{en:'Yellow',he:'צהוב',t:'ילו',e:'💛'},
-        {en:'Orange',he:'כתום',t:"אורנג'",e:'🟠'},{en:'Purple',he:'סגול',t:'פורפל',e:'💜'},
-        {en:'Pink',he:'ורוד',t:'פינק',e:'🩷'},{en:'Black',he:'שחור',t:'בלאק',e:'⚫'},
-        {en:'White',he:'לבן',t:'וויט',e:'⚪'},{en:'Brown',he:'חום',t:'בראון',e:'🟤'}
-      ]},
-      { id:'numbers', title:'מספרים', emoji:'🔢', mode:'heToEn', words:[
-        {en:'One',he:'אחד',t:'וואן',e:'1️⃣'},{en:'Two',he:'שניים',t:'טו',e:'2️⃣'},
-        {en:'Three',he:'שלוש',t:'תרי',e:'3️⃣'},{en:'Four',he:'ארבע',t:'פור',e:'4️⃣'},
-        {en:'Five',he:'חמש',t:'פייב',e:'5️⃣'},{en:'Six',he:'שש',t:'סיקס',e:'6️⃣'},
-        {en:'Seven',he:'שבע',t:'סבן',e:'7️⃣'},{en:'Eight',he:'שמונה',t:'אייט',e:'8️⃣'},
-        {en:'Nine',he:'תשע',t:'נאיין',e:'9️⃣'},{en:'Ten',he:'עשר',t:'טן',e:'🔟'}
-      ]},
-      { id:'food', title:'אוכל', emoji:'🍎', mode:'heToEn', words:[
-        {en:'Apple',he:'תפוח',t:'אפּל',e:'🍎'},{en:'Bread',he:'לחם',t:'ברד',e:'🍞'},
-        {en:'Milk',he:'חלב',t:'מילק',e:'🥛'},{en:'Egg',he:'ביצה',t:'אג',e:'🥚'},
-        {en:'Cheese',he:'גבינה',t:"צ'יז",e:'🧀'},{en:'Pizza',he:'פיצה',t:'פּיצה',e:'🍕'},
-        {en:'Cake',he:'עוגה',t:'קייק',e:'🎂'},{en:'Water',he:'מים',t:'ווטר',e:'💧'},
-        {en:'Juice',he:'מיץ',t:"ג'וס",e:'🧃'},{en:'Banana',he:'בננה',t:'בנאנה',e:'🍌'}
-      ]},
-      { id:'body', title:'חלקי גוף', emoji:'🧑', mode:'heToEn', words:[
-        {en:'Head',he:'ראש',t:'הד',e:'🗣️'},{en:'Eye',he:'עין',t:'אאי',e:'👁️'},
-        {en:'Nose',he:'אף',t:'נוז',e:'👃'},{en:'Mouth',he:'פה',t:'מאות',e:'👄'},
-        {en:'Ear',he:'אוזן',t:'איר',e:'👂'},{en:'Hand',he:'יד',t:'האנד',e:'✋'},
-        {en:'Foot',he:'רגל',t:'פוט',e:'🦶'},{en:'Hair',he:'שיער',t:'הר',e:'💇'},
-        {en:'Tooth',he:'שן',t:'טות',e:'🦷'},{en:'Leg',he:'שוק',t:'לג',e:'🦵'}
-      ]},
-      { id:'family', title:'משפחה', emoji:'👨‍👩‍👧‍👦', mode:'heToEn', words:[
-        {en:'Mother',he:'אמא',t:'מאדר',e:'👩'},{en:'Father',he:'אבא',t:'פאדר',e:'👨'},
-        {en:'Sister',he:'אחות',t:'סיסטר',e:'👧'},{en:'Brother',he:'אח',t:'ברדר',e:'👦'},
-        {en:'Baby',he:'תינוק',t:'בייבי',e:'👶'},{en:'Grandmother',he:'סבתא',t:'גרנדמאדר',e:'👵'},
-        {en:'Grandfather',he:'סבא',t:'גרנדפאדר',e:'👴'},{en:'Family',he:'משפחה',t:'פמילי',e:'👨‍👩‍👧‍👦'},
-        {en:'Son',he:'בן',t:'סאן',e:'🧒'},{en:'Daughter',he:'בת',t:'דוטר',e:'👧'}
-      ]},
-      { id:'school', title:'בית ספר', emoji:'🏫', mode:'heToEn', words:[
-        {en:'Book',he:'ספר',t:'בוק',e:'📚'},{en:'Pen',he:'עט',t:'פן',e:'✏️'},
-        {en:'Teacher',he:'מורה',t:"טיצ'ר",e:'👩‍🏫'},{en:'Student',he:'תלמיד',t:'סטיודנט',e:'🧑‍🎓'},
-        {en:'Desk',he:'שולחן',t:'דסק',e:'🪑'},{en:'Bag',he:'תיק',t:'באג',e:'🎒'},
-        {en:'Class',he:'כיתה',t:'קלאס',e:'🏫'},{en:'Board',he:'לוח',t:'בורד',e:'📋'},
-        {en:'Ruler',he:'סרגל',t:'רולר',e:'📏'},{en:'Eraser',he:'מחק',t:'ארייסר',e:'🧹'}
-      ]},
-      { id:'clothes', title:'בגדים', emoji:'👕', mode:'heToEn', words:[
-        {en:'Shirt',he:'חולצה',t:'שורט',e:'👕'},{en:'Pants',he:'מכנסיים',t:'פנטס',e:'👖'},
-        {en:'Shoes',he:'נעליים',t:'שוז',e:'👟'},{en:'Hat',he:'כובע',t:'האט',e:'🎩'},
-        {en:'Dress',he:'שמלה',t:'דרס',e:'👗'},{en:'Socks',he:'גרביים',t:'סוקס',e:'🧦'},
-        {en:'Jacket',he:'מעיל',t:"ג'קט",e:'🧥'},{en:'Gloves',he:'כפפות',t:'גלובס',e:'🧤'},
-        {en:'Scarf',he:'צעיף',t:'סקארף',e:'🧣'},{en:'Boots',he:'מגפיים',t:'בוטס',e:'👢'}
-      ]},
-      { id:'shapes', title:'צורות', emoji:'🔷', mode:'heToEn', words:[
-        {en:'Circle',he:'עיגול',t:'סורקל',e:'⭕'},{en:'Square',he:'ריבוע',t:'סקווייר',e:'🟦'},
-        {en:'Triangle',he:'משולש',t:'טריאנגל',e:'🔺'},{en:'Star',he:'כוכב',t:'סטאר',e:'⭐'},
-        {en:'Heart',he:'לב',t:'הארט',e:'❤️'},{en:'Rectangle',he:'מלבן',t:'רקטנגל',e:'🔲'},
-        {en:'Oval',he:'אליפסה',t:'אובל',e:'🥚'},{en:'Diamond',he:'מעוין',t:'דיימנד',e:'💎'},
-        {en:'Arrow',he:'חץ',t:'ארו',e:'➡️'},{en:'Cross',he:'צלב',t:'קרוס',e:'✚'}
-      ]},
-      { id:'transport', title:'כלי תחבורה', emoji:'🚗', mode:'heToEn', words:[
-        {en:'Car',he:'מכונית',t:'קאר',e:'🚗'},{en:'Bus',he:'אוטובוס',t:'באס',e:'🚌'},
-        {en:'Train',he:'רכבת',t:'טריין',e:'🚂'},{en:'Plane',he:'מטוס',t:'פליין',e:'✈️'},
-        {en:'Boat',he:'סירה',t:'בוט',e:'⛵'},{en:'Bicycle',he:'אופניים',t:'בייסיקל',e:'🚲'},
-        {en:'Motorcycle',he:'אופנוע',t:'מוטורסייקל',e:'🏍️'},{en:'Truck',he:'משאית',t:'טראק',e:'🚛'},
-        {en:'Helicopter',he:'מסוק',t:'הליקופטר',e:'🚁'},{en:'Rocket',he:'רקטה',t:'רוקט',e:'🚀'}
-      ]},
-      { id:'nature', title:'הטבע', emoji:'🌿', mode:'heToEn', words:[
-        {en:'Sun',he:'שמש',t:'סאן',e:'☀️'},{en:'Moon',he:'ירח',t:'מון',e:'🌙'},
-        {en:'Star',he:'כוכב',t:'סטאר',e:'⭐'},{en:'Rain',he:'גשם',t:'ריין',e:'🌧️'},
-        {en:'Snow',he:'שלג',t:'סנו',e:'❄️'},{en:'Tree',he:'עץ',t:'טרי',e:'🌳'},
-        {en:'Flower',he:'פרח',t:'פלאור',e:'🌸'},{en:'Mountain',he:'הר',t:'מאונטן',e:'⛰️'},
-        {en:'Sea',he:'ים',t:'סי',e:'🌊'},{en:'Cloud',he:'ענן',t:'קלאוד',e:'☁️'}
-      ]},
-      { id:'sentences_b', title:'משפטים פשוטים', emoji:'💬', mode:'sentences', words:[
-        {en:'Hello! My name is...',he:'שלום! שמי הוא...',t:'',e:'👋'},
-        {en:'How are you?',he:'מה שלומך?',t:'',e:'😊'},
-        {en:'I am fine, thank you.',he:'אני בסדר, תודה.',t:'',e:'😄'},
-        {en:'What is your name?',he:'מה שמך?',t:'',e:'🤔'},
-        {en:'I like cats.',he:'אני אוהב חתולים.',t:'',e:'🐱'},
-        {en:'I am hungry.',he:'אני רעב.',t:'',e:'🍽️'},
-        {en:'Good morning!',he:'בוקר טוב!',t:'',e:'🌅'},
-        {en:'Good night!',he:'לילה טוב!',t:'',e:'🌙'},
-        {en:'I love you.',he:'אני אוהב אותך.',t:'',e:'❤️'},
-        {en:'See you later!',he:'להתראות!',t:'',e:'👋'}
-      ]}
-    ];
+const advancedUnits=[
+  {id:'verbs',title:'פעלים',emoji:'🏃',mode:'heToEn',words:[
+    {en:'Run',he:'לרוץ',t:'ראן',e:'🏃'},{en:'Jump',he:'לקפוץ',t:"ג'אמפ",e:'🤸'},
+    {en:'Eat',he:'לאכול',t:'איט',e:'🍽️'},{en:'Drink',he:'לשתות',t:'דרינק',e:'🥤'},
+    {en:'Sleep',he:'לישון',t:'סליפ',e:'😴'},{en:'Read',he:'לקרוא',t:'ריד',e:'📖'},
+    {en:'Write',he:'לכתוב',t:'ריט',e:'✍️'},{en:'Play',he:'לשחק',t:'פליי',e:'🎮'},
+    {en:'Swim',he:'לשחות',t:'סווים',e:'🏊'},{en:'Fly',he:'לעוף',t:'פלאי',e:'✈️'},
+    {en:'Cook',he:'לבשל',t:'קוק',e:'👨‍🍳'},{en:'Sing',he:'לשיר',t:'סינג',e:'🎤'}
+  ]},
+  {id:'adjectives',title:'תארי שם',emoji:'📝',mode:'heToEn',words:[
+    {en:'Big',he:'גדול',t:'ביג',e:'🐘'},{en:'Small',he:'קטן',t:'סמול',e:'🐭'},
+    {en:'Fast',he:'מהיר',t:'פסט',e:'🚀'},{en:'Slow',he:'איטי',t:'סלו',e:'🐢'},
+    {en:'Hot',he:'חם',t:'הוט',e:'🔥'},{en:'Cold',he:'קר',t:'קולד',e:'🧊'},
+    {en:'Happy',he:'שמח',t:"הפּי",e:'😄'},{en:'Sad',he:'עצוב',t:'סד',e:'😢'},
+    {en:'Beautiful',he:'יפה',t:'ביוטיפול',e:'🌸'},{en:'Clean',he:'נקי',t:'קלין',e:'🧼'},
+    {en:'Dirty',he:'מלוכלך',t:'דורטי',e:'🪣'},{en:'Ugly',he:'מכוער',t:'אגלי',e:'👹'}
+  ]},
+  {id:'places',title:'מקומות',emoji:'📍',mode:'heToEn',words:[
+    {en:'School',he:'בית ספר',t:'סקול',e:'🏫'},{en:'Hospital',he:'בית חולים',t:'הוספיטל',e:'🏥'},
+    {en:'Park',he:'פארק',t:'פארק',e:'🌳'},{en:'Store',he:'חנות',t:'סטור',e:'🏪'},
+    {en:'Library',he:'ספרייה',t:'לייברארי',e:'📚'},{en:'Restaurant',he:'מסעדה',t:'רסטורנט',e:'🍽️'},
+    {en:'Beach',he:'חוף ים',t:"ביץ'",e:'🏖️'},{en:'Museum',he:'מוזיאון',t:'מיוזיאם',e:'🏛️'},
+    {en:'Airport',he:'שדה תעופה',t:'אירפורט',e:'✈️'},{en:'Hotel',he:'מלון',t:'הוטל',e:'🏨'}
+  ]},
+  {id:'weather',title:'מזג האוויר',emoji:'🌤️',mode:'heToEn',words:[
+    {en:'Sunny',he:'שמשי',t:'סאני',e:'☀️'},{en:'Cloudy',he:'מעונן',t:'קלאודי',e:'☁️'},
+    {en:'Rainy',he:'גשום',t:'ריינאי',e:'🌧️'},{en:'Snowy',he:'מושלג',t:'סנואי',e:'❄️'},
+    {en:'Windy',he:'רוחי',t:'ווינדי',e:'💨'},{en:'Stormy',he:'סוער',t:'סטורמי',e:'⛈️'},
+    {en:'Foggy',he:'ערפלי',t:'פוגי',e:'🌫️'},{en:'Hot',he:'חם',t:'הוט',e:'🌡️'},
+    {en:'Cold',he:'קר',t:'קולד',e:'🥶'},{en:'Rainbow',he:'קשת',t:'ריינבו',e:'🌈'}
+  ]},
+  {id:'time',title:'ימים ושעות',emoji:'📅',mode:'heToEn',words:[
+    {en:'Monday',he:'יום שני',t:'מאנדיי',e:'📅'},{en:'Tuesday',he:'יום שלישי',t:'טיוזדיי',e:'📅'},
+    {en:'Wednesday',he:'יום רביעי',t:"ווד'נסדיי",e:'📅'},{en:'Thursday',he:'יום חמישי',t:'תורסדיי',e:'📅'},
+    {en:'Friday',he:'יום שישי',t:'פריידיי',e:'📅'},{en:'Saturday',he:'שבת',t:'סטורדיי',e:'📅'},
+    {en:'Sunday',he:'ראשון',t:'סאנדיי',e:'📅'},{en:'Morning',he:'בוקר',t:'מורנינג',e:'🌅'},
+    {en:'Afternoon',he:'אחה"צ',t:'אפטרנון',e:'🌞'},{en:'Night',he:'לילה',t:'נאיט',e:'🌙'}
+  ]},
+  {id:'emotions',title:'רגשות',emoji:'😄',mode:'heToEn',words:[
+    {en:'Happy',he:'שמח',t:"הפּי",e:'😄'},{en:'Sad',he:'עצוב',t:'סד',e:'😢'},
+    {en:'Angry',he:'כועס',t:'אנגרי',e:'😠'},{en:'Scared',he:'מפוחד',t:'סקיירד',e:'😨'},
+    {en:'Surprised',he:'מופתע',t:'סורפרייזד',e:'😮'},{en:'Tired',he:'עייף',t:'טאיירד',e:'😴'},
+    {en:'Excited',he:'נרגש',t:'אקסייטד',e:'🤩'},{en:'Bored',he:'משועמם',t:'בורד',e:'😑'},
+    {en:'Proud',he:'גאה',t:"פּראוד",e:'😤'},{en:'Shy',he:'ביישן',t:'שאי',e:'😊'},
+    {en:'Confused',he:'מבולבל',t:'קונפיוזד',e:'😕'},{en:'Brave',he:'אמיץ',t:'ברייב',e:'💪'}
+  ]},
+  {id:'sports',title:'ספורט ותחביבים',emoji:'⚽',mode:'heToEn',words:[
+    {en:'Football',he:'כדורגל',t:'פוטבול',e:'⚽'},{en:'Basketball',he:'כדורסל',t:'באסקטבול',e:'🏀'},
+    {en:'Swimming',he:'שחייה',t:'סווימינג',e:'🏊'},{en:'Running',he:'ריצה',t:'ראנינג',e:'🏃'},
+    {en:'Painting',he:'ציור',t:'פיינטינג',e:'🎨'},{en:'Reading',he:'קריאה',t:'רידינג',e:'📚'},
+    {en:'Music',he:'מוזיקה',t:'מיוזיק',e:'🎵'},{en:'Dancing',he:'ריקוד',t:'דנסינג',e:'💃'},
+    {en:'Cooking',he:'בישול',t:'קוקינג',e:'👨‍🍳'},{en:'Tennis',he:'טניס',t:'טניס',e:'🎾'}
+  ]},
+  {id:'expressions',title:'ביטויים יומיומיים',emoji:'💬',mode:'enToHe',words:[
+    {en:'Good morning!',he:'בוקר טוב!',t:'',e:'🌅'},
+    {en:'Good night!',he:'לילה טוב!',t:'',e:'🌙'},
+    {en:'Please',he:'בבקשה',t:'',e:'🙏'},
+    {en:'Thank you!',he:'תודה!',t:'',e:'😊'},
+    {en:"You're welcome!",he:'בשמחה!',t:'',e:'😄'},
+    {en:'Excuse me',he:'סליחה',t:'',e:'🤔'},
+    {en:"I'm sorry",he:'אני מצטער',t:'',e:'😔'},
+    {en:'Can you help me?',he:'תוכל לעזור לי?',t:'',e:'🤝'},
+    {en:'How much does it cost?',he:'כמה זה עולה?',t:'',e:'💰'},
+    {en:'Where is the bathroom?',he:'איפה השירותים?',t:'',e:'🚽'},
+    {en:"I don't understand",he:'אני לא מבין',t:'',e:'😕'},
+    {en:'Have a nice day!',he:'יום נעים!',t:'',e:'☀️'}
+  ]},
+  {id:'science',title:'מדע',emoji:'🔬',mode:'heToEn',words:[
+    {en:'Experiment',he:'ניסוי',t:'אקספרימנט',e:'🧪'},{en:'Microscope',he:'מיקרוסקופ',t:'מייקרוסקופ',e:'🔬'},
+    {en:'Planet',he:'כוכב לכת',t:'פלנט',e:'🪐'},{en:'Gravity',he:'כבידה',t:'גרביטי',e:'🍎'},
+    {en:'Atom',he:'אטום',t:'אטום',e:'⚛️'},{en:'Energy',he:'אנרגיה',t:"אנרג'י",e:'⚡'},
+    {en:'Oxygen',he:'חמצן',t:'אוקסיגן',e:'💨'},{en:'Water',he:'מים',t:'ווטר',e:'💧'},
+    {en:'Light',he:'אור',t:'לייט',e:'💡'},{en:'Magnet',he:'מגנט',t:'מגנט',e:'🧲'}
+  ]},
+  {id:'geography',title:'גאוגרפיה',emoji:'🌍',mode:'heToEn',words:[
+    {en:'Continent',he:'יבשת',t:'קונטיננט',e:'🌍'},{en:'Ocean',he:'אוקיינוס',t:'אושן',e:'🌊'},
+    {en:'Desert',he:'מדבר',t:'דזרט',e:'🏜️'},{en:'Forest',he:'יער',t:'פורסט',e:'🌲'},
+    {en:'River',he:'נהר',t:'ריבר',e:'🏞️'},{en:'Volcano',he:'הר געש',t:'וולקנו',e:'🌋'},
+    {en:'Island',he:'אי',t:'איילנד',e:'🏝️'},{en:'Mountain',he:'הר',t:'מאונטן',e:'⛰️'},
+    {en:'Country',he:'מדינה',t:'קאנטרי',e:'🏳️'},{en:'Capital',he:'בירה',t:'קפיטל',e:'🏙️'}
+  ]},
+  {id:'technology',title:'טכנולוגיה',emoji:'💻',mode:'heToEn',words:[
+    {en:'Computer',he:'מחשב',t:'קומפיוטר',e:'💻'},{en:'Phone',he:'טלפון',t:'פון',e:'📱'},
+    {en:'Internet',he:'אינטרנט',t:'אינטרנט',e:'🌐'},{en:'Robot',he:'רובוט',t:'רובוט',e:'🤖'},
+    {en:'Camera',he:'מצלמה',t:'קמרה',e:'📷'},{en:'Battery',he:'סוללה',t:'בטרי',e:'🔋'},
+    {en:'Keyboard',he:'מקלדת',t:'קיבורד',e:'⌨️'},{en:'Screen',he:'מסך',t:'סקרין',e:'🖥️'},
+    {en:'Satellite',he:'לוויין',t:'סטלייט',e:'🛰️'},{en:'Password',he:'סיסמה',t:'פסוורד',e:'🔐'}
+  ]},
+  {id:'sentences_a',title:'משפטים מתקדמים',emoji:'🗣️',mode:'sentences',words:[
+    {en:'I would like to order, please.',he:'הייתי רוצה להזמין, בבקשה.',t:'',e:'🍽️'},
+    {en:'What time does the store close?',he:'מתי החנות נסגרת?',t:'',e:'🕐'},
+    {en:'Can I have the bill, please?',he:'אפשר לקבל את החשבון?',t:'',e:'💳'},
+    {en:'I need help with my homework.',he:'אני צריך עזרה עם שיעורי הבית.',t:'',e:'📚'},
+    {en:'The weather is beautiful today.',he:'מזג האוויר נפלא היום.',t:'',e:'☀️'},
+    {en:'Could you speak more slowly?',he:'תוכל לדבר לאט יותר?',t:'',e:'🗣️'},
+    {en:'I enjoy reading books.',he:'אני נהנה לקרוא ספרים.',t:'',e:'📖'},
+    {en:'I have been learning English for two years.',he:'אני לומד אנגלית כבר שנתיים.',t:'',e:'🎓'}
+  ]},
+  {id:'reading',title:'קטעי קריאה',emoji:'📖',mode:'reading',words:[],passages:[
+    {title:'My Pet Dog',
+     text:"My name is Tom. I am ten years old. I have a dog. His name is Max. Max is brown and white. He likes to run in the park. Every morning, I give Max his food. He loves to play with his ball. Max is my best friend.",
+     questions:[
+       {q:'מה שם הכלב?',opts:['Max','Tom','Brown','Jack'],correct:0},
+       {q:'איזה צבע הכלב?',opts:['שחור','חום ולבן','צהוב','כחול'],correct:1},
+       {q:'מה מקס אוהב לעשות?',opts:['לישון','לשחות','לשחק עם הכדור','לאכול עוגה'],correct:2}
+     ]},
+    {title:'My School Day',
+     text:"Every day I wake up at seven o'clock. I eat breakfast and go to school. My school starts at eight o'clock. I have five lessons every day. My favorite subject is science. At twelve o'clock, I eat lunch with my friends. After school, I do my homework. Then I watch TV and go to sleep at nine o'clock.",
+     questions:[
+       {q:'מתי מתחיל בית הספר?',opts:['שבע','שמונה','תשע','עשר'],correct:1},
+       {q:'מה המקצוע האהוב?',opts:['מתמטיקה','אנגלית','מדע','ספורט'],correct:2},
+       {q:'מתי הילד הולך לישון?',opts:['שמונה','תשע','עשר','אחת עשרה'],correct:1}
+     ]},
+    {title:'The Seasons',
+     text:"There are four seasons in a year. In spring, flowers bloom and birds sing. The weather is warm and beautiful. In summer, it is very hot. Children swim in the sea and eat ice cream. In autumn, leaves fall from the trees. The weather becomes cool. In winter, it is cold and sometimes it snows. We wear warm clothes and stay inside.",
+     questions:[
+       {q:'כמה עונות יש בשנה?',opts:['שתיים','שלוש','ארבע','חמש'],correct:2},
+       {q:'מה קורה באביב?',opts:['שלג יורד','פרחים פורחים','עלים נושרים','חם מאוד'],correct:1},
+       {q:'מה ילדים עושים בקיץ?',opts:['שרים','שוחים בים','לובשים מעיל','קוראים'],correct:1}
+     ]}
+  ]}
+];
 
-    const advancedUnits = [
-      { id:'verbs', title:'פעלים', emoji:'🏃', mode:'heToEn', words:[
-        {en:'Run',he:'לרוץ',t:'ראן',e:'🏃'},{en:'Jump',he:'לקפוץ',t:"ג'אמפּ",e:'🤸'},
-        {en:'Eat',he:'לאכול',t:'איט',e:'🍽️'},{en:'Drink',he:'לשתות',t:'דרינק',e:'🥤'},
-        {en:'Sleep',he:'לישון',t:'סליפּ',e:'😴'},{en:'Read',he:'לקרוא',t:'ריד',e:'📖'},
-        {en:'Write',he:'לכתוב',t:'ריט',e:'✍️'},{en:'Play',he:'לשחק',t:'פּליי',e:'🎮'},
-        {en:'Swim',he:'לשחות',t:'סווים',e:'🏊'},{en:'Fly',he:'לעוף',t:'פלאי',e:'✈️'},
-        {en:'Cook',he:'לבשל',t:'קוק',e:'👨‍🍳'},{en:'Sing',he:'לשיר',t:'סינג',e:'🎤'}
-      ]},
-      { id:'adjectives', title:'תארי שם', emoji:'📝', mode:'heToEn', words:[
-        {en:'Big',he:'גדול',t:'ביג',e:'🐘'},{en:'Small',he:'קטן',t:'סמול',e:'🐭'},
-        {en:'Fast',he:'מהיר',t:'פסט',e:'🚀'},{en:'Slow',he:'איטי',t:'סלו',e:'🐢'},
-        {en:'Hot',he:'חם',t:'הוט',e:'🔥'},{en:'Cold',he:'קר',t:'קולד',e:'🧊'},
-        {en:'Happy',he:'שמח',t:'הפּי',e:'😄'},{en:'Sad',he:'עצוב',t:'סד',e:'😢'},
-        {en:'Beautiful',he:'יפה',t:'ביוטיפול',e:'🌸'},{en:'Clean',he:'נקי',t:'קלין',e:'🧼'},
-        {en:'Dirty',he:'מלוכלך',t:'דורטי',e:'🪣'},{en:'Ugly',he:'מכוער',t:'אגלי',e:'👹'}
-      ]},
-      { id:'places', title:'מקומות', emoji:'📍', mode:'heToEn', words:[
-        {en:'School',he:'בית ספר',t:'סקול',e:'🏫'},{en:'Hospital',he:'בית חולים',t:'הוספּיטל',e:'🏥'},
-        {en:'Park',he:'פארק',t:'פארק',e:'🌳'},{en:'Store',he:'חנות',t:'סטור',e:'🏪'},
-        {en:'Library',he:'ספרייה',t:'לייברארי',e:'📚'},{en:'Restaurant',he:'מסעדה',t:'רסטורנט',e:'🍽️'},
-        {en:'Beach',he:'חוף ים',t:"ביץ'",e:'🏖️'},{en:'Museum',he:'מוזיאון',t:'מיוזיאם',e:'🏛️'},
-        {en:'Airport',he:'שדה תעופה',t:'אירפּורט',e:'✈️'},{en:'Hotel',he:'מלון',t:'הוטל',e:'🏨'}
-      ]},
-      { id:'weather', title:'מזג האוויר', emoji:'🌤️', mode:'heToEn', words:[
-        {en:'Sunny',he:'שמשי',t:'סאני',e:'☀️'},{en:'Cloudy',he:'מעונן',t:'קלאודי',e:'☁️'},
-        {en:'Rainy',he:'גשום',t:'ריינאי',e:'🌧️'},{en:'Snowy',he:'מושלג',t:'סנואי',e:'❄️'},
-        {en:'Windy',he:'רוחי',t:'ווינדי',e:'💨'},{en:'Stormy',he:'סוער',t:'סטורמי',e:'⛈️'},
-        {en:'Foggy',he:'ערפלי',t:'פוגי',e:'🌫️'},{en:'Hot',he:'חם',t:'הוט',e:'🌡️'},
-        {en:'Cold',he:'קר',t:'קולד',e:'🥶'},{en:'Rainbow',he:'קשת',t:'ריינבו',e:'🌈'}
-      ]},
-      { id:'time', title:'ימים ושעות', emoji:'📅', mode:'heToEn', words:[
-        {en:'Monday',he:'יום שני',t:'מאנדיי',e:'📅'},{en:'Tuesday',he:'יום שלישי',t:'טיוזדיי',e:'📅'},
-        {en:'Wednesday',he:'יום רביעי',t:"ווד'נסדיי",e:'📅'},{en:'Thursday',he:'יום חמישי',t:'תורסדיי',e:'📅'},
-        {en:'Friday',he:'יום שישי',t:'פריידיי',e:'📅'},{en:'Saturday',he:'שבת',t:'סטורדיי',e:'📅'},
-        {en:'Sunday',he:'ראשון',t:'סאנדיי',e:'📅'},{en:'Morning',he:'בוקר',t:'מורנינג',e:'🌅'},
-        {en:'Afternoon',he:'אחה"צ',t:'אפטרנון',e:'🌞'},{en:'Night',he:'לילה',t:'נאיט',e:'🌙'}
-      ]},
-      { id:'emotions', title:'רגשות', emoji:'😄', mode:'heToEn', words:[
-        {en:'Happy',he:'שמח',t:'הפּי',e:'😄'},{en:'Sad',he:'עצוב',t:'סד',e:'😢'},
-        {en:'Angry',he:'כועס',t:'אנגרי',e:'😠'},{en:'Scared',he:'מפוחד',t:'סקיירד',e:'😨'},
-        {en:'Surprised',he:'מופתע',t:'סורפּרייזד',e:'😮'},{en:'Tired',he:'עייף',t:'טאיירד',e:'😴'},
-        {en:'Excited',he:'נרגש',t:'אקסייטד',e:'🤩'},{en:'Bored',he:'משועמם',t:'בורד',e:'😑'},
-        {en:'Proud',he:'גאה',t:'פּראוד',e:'😤'},{en:'Shy',he:'ביישן',t:'שאי',e:'😊'},
-        {en:'Confused',he:'מבולבל',t:'קונפיוזד',e:'😕'},{en:'Brave',he:'אמיץ',t:'ברייב',e:'💪'}
-      ]},
-      { id:'sports', title:'ספורט ותחביבים', emoji:'⚽', mode:'heToEn', words:[
-        {en:'Football',he:'כדורגל',t:'פוטבול',e:'⚽'},{en:'Basketball',he:'כדורסל',t:'באסקטבול',e:'🏀'},
-        {en:'Swimming',he:'שחייה',t:'סווימינג',e:'🏊'},{en:'Running',he:'ריצה',t:'ראנינג',e:'🏃'},
-        {en:'Painting',he:'ציור',t:'פּיינטינג',e:'🎨'},{en:'Reading',he:'קריאה',t:'רידינג',e:'📚'},
-        {en:'Music',he:'מוזיקה',t:'מיוזיק',e:'🎵'},{en:'Dancing',he:'ריקוד',t:'דנסינג',e:'💃'},
-        {en:'Cooking',he:'בישול',t:'קוקינג',e:'👨‍🍳'},{en:'Tennis',he:'טניס',t:'טניס',e:'🎾'}
-      ]},
-      { id:'expressions', title:'ביטויים יומיומיים', emoji:'💬', mode:'enToHe', words:[
-        {en:'Good morning!',he:'בוקר טוב!',t:'',e:'🌅'},
-        {en:'Good night!',he:'לילה טוב!',t:'',e:'🌙'},
-        {en:'Please',he:'בבקשה',t:'',e:'🙏'},
-        {en:'Thank you!',he:'תודה!',t:'',e:'😊'},
-        {en:"You're welcome!",he:'בשמחה!',t:'',e:'😄'},
-        {en:'Excuse me',he:'סליחה',t:'',e:'🤔'},
-        {en:"I'm sorry",he:'אני מצטער',t:'',e:'😔'},
-        {en:'Can you help me?',he:'תוכל לעזור לי?',t:'',e:'🤝'},
-        {en:'How much does it cost?',he:'כמה זה עולה?',t:'',e:'💰'},
-        {en:'Where is the bathroom?',he:'איפה השירותים?',t:'',e:'🚽'},
-        {en:"I don't understand",he:'אני לא מבין',t:'',e:'😕'},
-        {en:'Have a nice day!',he:'יום נעים!',t:'',e:'☀️'}
-      ]},
-      { id:'science', title:'מדע', emoji:'🔬', mode:'heToEn', words:[
-        {en:'Experiment',he:'ניסוי',t:'אקספּרימנט',e:'🧪'},{en:'Microscope',he:'מיקרוסקופ',t:'מייקרוסקופּ',e:'🔬'},
-        {en:'Planet',he:'כוכב לכת',t:'פּלנט',e:'🪐'},{en:'Gravity',he:'כבידה',t:'גרביטי',e:'🍎'},
-        {en:'Atom',he:'אטום',t:'אטום',e:'⚛️'},{en:'Energy',he:'אנרגיה',t:"אנרג'י",e:'⚡'},
-        {en:'Oxygen',he:'חמצן',t:'אוקסיגן',e:'💨'},{en:'Water',he:'מים',t:'ווטר',e:'💧'},
-        {en:'Light',he:'אור',t:'לייט',e:'💡'},{en:'Magnet',he:'מגנט',t:'מגנט',e:'🧲'}
-      ]},
-      { id:'geography', title:'גאוגרפיה', emoji:'🌍', mode:'heToEn', words:[
-        {en:'Continent',he:'יבשת',t:'קונטיננט',e:'🌍'},{en:'Ocean',he:'אוקיינוס',t:'אושן',e:'🌊'},
-        {en:'Desert',he:'מדבר',t:'דזרט',e:'🏜️'},{en:'Forest',he:'יער',t:'פורסט',e:'🌲'},
-        {en:'River',he:'נהר',t:'ריבר',e:'🏞️'},{en:'Volcano',he:'הר געש',t:'וולקנו',e:'🌋'},
-        {en:'Island',he:'אי',t:'איילנד',e:'🏝️'},{en:'Mountain',he:'הר',t:'מאונטן',e:'⛰️'},
-        {en:'Country',he:'מדינה',t:'קאנטרי',e:'🏳️'},{en:'Capital',he:'בירה',t:'קפּיטל',e:'🏙️'}
-      ]},
-      { id:'technology', title:'טכנולוגיה', emoji:'💻', mode:'heToEn', words:[
-        {en:'Computer',he:'מחשב',t:'קומפּיוטר',e:'💻'},{en:'Phone',he:'טלפון',t:'פון',e:'📱'},
-        {en:'Internet',he:'אינטרנט',t:'אינטרנט',e:'🌐'},{en:'Robot',he:'רובוט',t:'רובוט',e:'🤖'},
-        {en:'Camera',he:'מצלמה',t:'קמרה',e:'📷'},{en:'Battery',he:'סוללה',t:'בטרי',e:'🔋'},
-        {en:'Keyboard',he:'מקלדת',t:'קיבורד',e:'⌨️'},{en:'Screen',he:'מסך',t:'סקרין',e:'🖥️'},
-        {en:'Satellite',he:'לוויין',t:'סטלייט',e:'🛰️'},{en:'Password',he:'סיסמה',t:'פּסוורד',e:'🔐'}
-      ]},
-      { id:'sentences_a', title:'משפטים מתקדמים', emoji:'🗣️', mode:'sentences', words:[
-        {en:'I would like to order, please.',he:'הייתי רוצה להזמין, בבקשה.',t:'',e:'🍽️'},
-        {en:'What time does the store close?',he:'מתי החנות נסגרת?',t:'',e:'🕐'},
-        {en:'Can I have the bill, please?',he:'אפשר לקבל את החשבון?',t:'',e:'💳'},
-        {en:'I need help with my homework.',he:'אני צריך עזרה עם שיעורי הבית.',t:'',e:'📚'},
-        {en:'The weather is beautiful today.',he:'מזג האוויר נפלא היום.',t:'',e:'☀️'},
-        {en:'Could you speak more slowly?',he:'תוכל לדבר לאט יותר?',t:'',e:'🗣️'},
-        {en:'I enjoy reading books.',he:'אני נהנה לקרוא ספרים.',t:'',e:'📖'},
-        {en:'I have been learning English for two years.',he:'אני לומד אנגלית כבר שנתיים.',t:'',e:'🎓'}
-      ]},
-      { id:'reading', title:'קטעי קריאה', emoji:'📖', mode:'reading', words:[], passages:[
-        { title:'My Pet Dog',
-          text:'My name is Tom. I am ten years old. I have a dog. His name is Max. Max is brown and white. He likes to run in the park. Every morning, I give Max his food. He loves to play with his ball. Max is my best friend.',
-          questions:[
-            {q:'מה שם הכלב?',opts:['Max','Tom','Brown','Jack'],correct:0},
-            {q:'איזה צבע הכלב?',opts:['שחור','חום ולבן','צהוב','כחול'],correct:1},
-            {q:'מה מקס אוהב לעשות?',opts:['לישון','לשחות','לשחק עם הכדור','לאכול עוגה'],correct:2}
-          ]
-        },
-        { title:'My School Day',
-          text:"Every day I wake up at seven o'clock. I eat breakfast and go to school. My school starts at eight o'clock. I have five lessons every day. My favorite subject is science. At twelve o'clock, I eat lunch with my friends. After school, I do my homework. Then I watch TV and go to sleep at nine o'clock.",
-          questions:[
-            {q:'מתי מתחיל בית הספר?',opts:['שבע','שמונה','תשע','עשר'],correct:1},
-            {q:'מה המקצוע האהוב?',opts:['מתמטיקה','אנגלית','מדע','ספורט'],correct:2},
-            {q:'מתי הילד הולך לישון?',opts:['שמונה','תשע','עשר','אחת עשרה'],correct:1}
-          ]
-        },
-        { title:'The Seasons',
-          text:'There are four seasons in a year. In spring, flowers bloom and birds sing. The weather is warm and beautiful. In summer, it is very hot. Children swim in the sea and eat ice cream. In autumn, leaves fall from the trees. The weather becomes cool. In winter, it is cold and sometimes it snows. We wear warm clothes and stay inside.',
-          questions:[
-            {q:'כמה עונות יש בשנה?',opts:['שתיים','שלוש','ארבע','חמש'],correct:2},
-            {q:'מה קורה באביב?',opts:['שלג יורד','פרחים פורחים','עלים נושרים','חם מאוד'],correct:1},
-            {q:'מה ילדים עושים בקיץ?',opts:['שרים','שוחים בים','לובשים מעיל','קוראים'],correct:1}
-          ]
-        }
-      ]}
-    ];
+const alphabet=[
+  {l:'A',w:'Apple',e:'🍎',t:'אפּל'},{l:'B',w:'Butterfly',e:'🐝',t:'באטרפלאי'},
+  {l:'C',w:'Cat',e:'🐱',t:'קאט'},{l:'D',w:'Dog',e:'🐕',t:'דוג'},
+  {l:'E',w:'Egg',e:'🥚',t:'אג'},{l:'F',w:'Fish',e:'🐟',t:'פיש'},
+  {l:'G',w:'Grapes',e:'🍇',t:'גרייפּס'},{l:'H',w:'House',e:'🏠',t:'האוס'},
+  {l:'I',w:'Ice Cream',e:'🍦',t:'אייס קריים'},{l:'J',w:'Juice',e:'🧃',t:"ג'וס"},
+  {l:'K',w:'Kite',e:'🪁',t:'קאייט'},{l:'L',w:'Lion',e:'🦁',t:'לאיון'},
+  {l:'M',w:'Moon',e:'🌙',t:'מון'},{l:'N',w:'Newspaper',e:'📰',t:'ניוספּייפּר'},
+  {l:'O',w:'Orange',e:'🍊',t:"אורנג'"},{l:'P',w:'Pizza',e:'🍕',t:'פּיצה'},
+  {l:'Q',w:'Queen',e:'👸',t:'קווין'},{l:'R',w:'Rainbow',e:'🌈',t:'ריינבו'},
+  {l:'S',w:'Star',e:'⭐',t:'סטאר'},{l:'T',w:'Tree',e:'🌳',t:'טרי'},
+  {l:'U',w:'Umbrella',e:'☂️',t:'אמברלה'},{l:'V',w:'Violin',e:'🎻',t:'ויולין'},
+  {l:'W',w:'Water',e:'🌊',t:'ווטר'},{l:'X',w:'Xylophone',e:'🎸',t:'זיילופון'},
+  {l:'Y',w:'Yogurt',e:'🧀',t:'יוגרט'},{l:'Z',w:'Zebra',e:'🦓',t:'זיברה'}
+];
+const vowels=new Set(['A','E','I','O','U']);
 
-    const alphabet = [
-      {l:'A',w:'Apple',e:'🍎',t:'אפּל'},{l:'B',w:'Butterfly',e:'🐝',t:'באטרפלאי'},
-      {l:'C',w:'Cat',e:'🐱',t:'קאט'},{l:'D',w:'Dog',e:'🐕',t:'דוג'},
-      {l:'E',w:'Egg',e:'🥚',t:'אג'},{l:'F',w:'Fish',e:'🐟',t:'פיש'},
-      {l:'G',w:'Grapes',e:'🍇',t:'גרייפּס'},{l:'H',w:'House',e:'🏠',t:'האוס'},
-      {l:'I',w:'Ice Cream',e:'🍦',t:'אייס קריים'},{l:'J',w:'Juice',e:'🧃',t:"ג'וס"},
-      {l:'K',w:'Kite',e:'🪁',t:'קאייט'},{l:'L',w:'Lion',e:'🦁',t:'לאיון'},
-      {l:'M',w:'Moon',e:'🌙',t:'מון'},{l:'N',w:'Newspaper',e:'📰',t:'ניוספּייפּר'},
-      {l:'O',w:'Orange',e:'🍊',t:"אורנג'"},{l:'P',w:'Pizza',e:'🍕',t:'פּיצה'},
-      {l:'Q',w:'Queen',e:'👸',t:'קווין'},{l:'R',w:'Rainbow',e:'🌈',t:'ריינבו'},
-      {l:'S',w:'Star',e:'⭐',t:'סטאר'},{l:'T',w:'Tree',e:'🌳',t:'טרי'},
-      {l:'U',w:'Umbrella',e:'☂️',t:'אמברלה'},{l:'V',w:'Violin',e:'🎻',t:'ויולין'},
-      {l:'W',w:'Water',e:'🌊',t:'ווטר'},{l:'X',w:'Xylophone',e:'🎸',t:'זיילופון'},
-      {l:'Y',w:'Yogurt',e:'🧀',t:'יוגרט'},{l:'Z',w:'Zebra',e:'🦓',t:'זיברה'}
-    ];
-    const vowels = new Set(['A','E','I','O','U']);
+// ============ STATE ============
+let state={
+  screen:'home',level:'beginner',unitId:null,
+  tab:'learn',cardIndex:0,cardFlipped:false,
+  matchQs:[],matchQ:0,matchScore:0,matchDone:false,
+  quizQs:[],quizQ:0,quizScore:0,quizDone:false,
+  readPsg:0,readQ:-1,readScore:0,readDone:false,
+  progress:{}
+};
 
-    // ===================== STATE =====================
+// ============ HELPERS ============
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function speak(txt,lang='en-US'){if(!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(txt);u.lang=lang;u.rate=0.8;speechSynthesis.cancel();speechSynthesis.speak(u)}
+function getUnits(){return state.level==='beginner'?beginnerUnits:advancedUnits}
+function getUnit(id){return getUnits().find(u=>u.id===id)}
+function getProg(id){return state.progress[id]||{stars:0,matchDone:false,quizDone:false}}
+function setProg(id,key,val){if(!state.progress[id])state.progress[id]={stars:0,matchDone:false,quizDone:false};if(key==='stars')state.progress[id].stars=Math.max(state.progress[id].stars,val);else state.progress[id][key]=val;save()}
+function load(){try{const raw=localStorage.getItem('englishApp_v1');state.progress=(raw?JSON.parse(raw):null)||{};if(typeof state.progress!=='object')state.progress={};}catch(e){state.progress={}}}
+function save(){localStorage.setItem('englishApp_v1',JSON.stringify({version:1,progress:state.progress}))}
+function starsStr(n,max=3){let s='';for(let i=0;i<max;i++)s+=i<n?'★':'☆';return s}
+function calcPct(id){const p=getProg(id);return Math.round(((p.matchDone?1:0)+(p.quizDone?1:0)+(p.stars>0?1:0))/3*100)}
 
-    let state = {
-      screen: 'home',
-      level: 'beginner',
-      unitId: null,
-      tab: 'learn',
-      cardIndex: 0,
-      cardFlipped: false,
-      matchQuestions: [],
-      matchQ: 0,
-      matchScore: 0,
-      matchDone: false,
-      quizQuestions: [],
-      quizQ: 0,
-      quizScore: 0,
-      quizDone: false,
-      progress: {},
-      readingPassage: 0,
-      readingQ: 0,
-      readingScore: 0,
-      readingDone: false,
-      readingAnswered: false
-    };
+function confetti(){
+  const b=document.createElement('div');b.className='cbox';
+  const cols=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff6bff','#ff9f43','#a29bfe'];
+  for(let i=0;i<55;i++){const p=document.createElement('div');p.className='cp';p.style.cssText=`left:${Math.random()*100}%;background:${cols[i%cols.length]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-delay:${Math.random()*1.5}s;animation-duration:${2.5+Math.random()*2}s`;b.appendChild(p)}
+  document.body.appendChild(b);setTimeout(()=>b.remove(),5000)
+}
 
-    // ===================== HELPERS =====================
+function buildMatchQs(unit){
+  if(unit.mode==='reading')return[];
+  return shuffle(unit.words).map(w=>{
+    const wrong=shuffle(unit.words.filter(x=>x!==w)).slice(0,3);
+    return{word:w,opts:shuffle([w,...wrong])};
+  });
+}
 
-    function shuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
+function buildQuizQs(unit){
+  if(unit.mode==='reading')return[];
+  return shuffle(unit.words).map(w=>{
+    if(unit.mode==='heToEn'&&w.en.length>=3){
+      const lets=w.en.toUpperCase().split('');
+      const hi=Math.floor(Math.random()*lets.length);
+      const cl=lets[hi];
+      const wl=shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(l=>l!==cl)).slice(0,3);
+      return{type:'letter',word:w,hideIdx:hi,correctLetter:cl,letterOpts:shuffle([cl,...wl])};
+    }else{
+      const wrong=shuffle(unit.words.filter(x=>x!==w)).slice(0,3);
+      return{type:'sentence',word:w,opts:shuffle([w,...wrong])};
     }
+  });
+}
 
-    function speak(text, lang='en-US') {
-      if (!window.speechSynthesis) return;
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = lang;
-      utt.rate = 0.8;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utt);
+// ============ RENDER ============
+function render(){
+  const app=document.getElementById('app');
+  if(state.screen==='home')app.innerHTML=renderHome();
+  else if(state.screen==='unit')app.innerHTML=renderUnit();
+  else if(state.screen==='alphabet')app.innerHTML=renderAlphabet();
+}
+
+function renderHome(){
+  const units=getUnits();
+  const tc=state.level==='beginner'?'theme-b':'theme-a';
+  const totalStars=Object.values(state.progress).reduce((s,p)=>s+(p.stars||0),0);
+  const cards=units.map(u=>{
+    const p=getProg(u.id);const pct=calcPct(u.id);
+    const done=p.stars>=3&&p.matchDone&&p.quizDone;
+    return`<div class="ucard" data-action="openUnit" data-unit-id="${u.id}">
+      ${done?'<div class="ucheck">✓</div>':''}
+      <div class="ucard-emoji">${u.emoji}</div>
+      <div class="ucard-title">${u.title}</div>
+      <div class="ucard-stars">${starsStr(p.stars||0)}</div>
+      <div class="ubar"><div class="ubar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+  return`<div class="${tc}">
+    <div class="home-header" style="text-align:center;padding:18px 0 8px">
+      <h1>🌟 לומדים אנגלית!</h1>
+    </div>
+    <div class="lvl-toggle">
+      <button class="lvl-btn${state.level==='beginner'?' active':''}" data-action="setLevel" data-level="beginner">מתחילים 🌱</button>
+      <button class="lvl-btn${state.level==='advanced'?' active':''}" data-action="setLevel" data-level="advanced">מתקדמים 🚀</button>
+    </div>
+    <div style="text-align:center;margin:8px 0 14px">
+      <button class="abc-btn" data-action="openAlphabet">🔤 אלפבית</button>
+    </div>
+    <div class="units-grid">${cards}</div>
+    <div class="total-bar">⭐ סה"כ: ${totalStars} כוכבים</div>
+    <div class="reset-wrap"><button class="reset-btn" data-action="resetProgress">🗑️ איפוס כל ההתקדמות</button></div>
+  </div>`;
+}
+
+function renderUnit(){
+  const unit=getUnit(state.unitId);
+  if(!unit)return renderHome();
+  const tc=state.level==='beginner'?'theme-b':'theme-a';
+  let content='';
+  if(state.tab==='learn')content=renderLearn(unit);
+  else if(state.tab==='match')content=renderMatch(unit);
+  else if(state.tab==='quiz')content=renderQuiz(unit);
+  return`<div class="${tc} unit-wrap">
+    <div class="unit-hdr">
+      <button class="back-btn" data-action="goHome">← חזרה</button>
+      <h2>${unit.emoji} ${unit.title}</h2>
+    </div>
+    <div class="tabs">
+      <button class="tab${state.tab==='learn'?' active':''}" data-action="setTab" data-tab="learn">📖 לומדים</button>
+      <button class="tab${state.tab==='match'?' active':''}" data-action="setTab" data-tab="match">🎮 משחק</button>
+      <button class="tab${state.tab==='quiz'?' active':''}" data-action="setTab" data-tab="quiz">⭐ חידון</button>
+    </div>
+    <div>${content}</div>
+  </div>`;
+}
+
+function renderLearn(unit){
+  if(unit.mode==='reading'){
+    const psg=unit.passages[state.readPsg]||unit.passages[0];
+    const btns=unit.passages.map((p,i)=>`<button class="psg-btn${state.readPsg===i?' active':''}" data-action="selectPassage" data-idx="${i}">${p.title}</button>`).join('');
+    return`<div>
+      <div class="reading-passages">${btns}</div>
+      <div class="psg-box">
+        <div class="psg-title">${psg.title}</div>
+        <div class="psg-text">${psg.text}</div>
+      </div>
+    </div>`;
+  }
+  const words=unit.words;
+  const w=words[state.cardIndex];
+  const dots=words.map((_,i)=>`<div class="dot${i===state.cardIndex?' on':''}"></div>`).join('');
+  const showTranslit=w.t&&unit.mode==='heToEn';
+  return`<div class="fcard">
+    <div class="fc-emoji">${w.e}</div>
+    <div class="fc-en" dir="ltr">${w.en}</div>
+    ${showTranslit?`<div class="fc-tr">${w.t}</div>`:''}
+    ${!state.cardFlipped
+      ?`<button class="flip-btn" data-action="flipCard">הצג תרגום 👁️</button>`
+      :`<div class="fc-he">${w.he}</div>
+       <button class="speak-btn" data-action="speakWord" data-text="${w.en}">🔊</button>`
     }
+    <div class="nav-row">
+      <button class="nav-btn" data-action="prevCard"${state.cardIndex===0?' disabled':''}>◄</button>
+      <div class="dots">${dots}</div>
+      <button class="nav-btn" data-action="nextCard"${state.cardIndex===words.length-1?' disabled':''}>►</button>
+    </div>
+  </div>`;
+}
 
-    function getUnits() {
-      return state.level === 'beginner' ? beginnerUnits : advancedUnits;
+function renderMatch(unit){
+  if(unit.mode==='reading'){
+    return renderReadingQuiz(unit);
+  }
+  if(state.matchDone){
+    const pct=state.matchScore/state.matchQs.length;
+    const stars=pct===1?3:pct>=0.75?2:pct>=0.5?1:0;
+    return`<div class="results">
+      <div style="font-size:2.5rem">🎮</div>
+      <div class="res-stars">${starsStr(stars)}</div>
+      <div class="res-score">${state.matchScore} / ${state.matchQs.length} נכון</div>
+      <div class="res-msg">${stars===3?'מושלם! 🎉':stars>=2?'כל הכבוד! 👍':'כדאי לתרגל עוד 💪'}</div>
+      <div class="res-btns">
+        <button class="btn btn-secondary" data-action="setTab" data-tab="match">שחק שוב 🔄</button>
+        <button class="btn btn-primary" data-action="setTab" data-tab="quiz">לחידון ⭐</button>
+      </div>
+    </div>`;
+  }
+  const q=state.matchQs[state.matchQ];
+  if(!q)return'';
+  const isEnToHe=unit.mode==='enToHe'||unit.mode==='sentences';
+  const optBtns=q.opts.map((o,i)=>`<button class="opt-btn" data-action="matchAnswer" data-idx="${i}" ${isEnToHe?'':'dir="ltr"'}>${isEnToHe?o.he:o.en}</button>`).join('');
+  return`<div class="match-wrap">
+    <div class="match-prog">${state.matchQ+1} / ${state.matchQs.length}</div>
+    <div class="match-prompt">${q.word.e}</div>
+    ${isEnToHe
+      ?`<div class="match-lbl-en" dir="ltr">${q.word.en}</div>`
+      :`<div class="match-lbl">${q.word.he}</div>`
     }
-
-    function getUnit(id) {
-      return getUnits().find(u => u.id === id);
-    }
-
-    function getProgress(unitId) {
-      return state.progress[unitId] || { stars: 0, matchDone: false, quizDone: false };
-    }
-
-    function updateProgress(unitId, key, val) {
-      if (!state.progress[unitId]) state.progress[unitId] = { stars: 0, matchDone: false, quizDone: false };
-      if (key === 'stars') {
-        state.progress[unitId].stars = Math.max(state.progress[unitId].stars, val);
-      } else {
-        state.progress[unitId][key] = val;
-      }
-      saveProgress();
-    }
-
-    function loadProgress() {
-      try {
-        const saved = localStorage.getItem('englishApp_v1');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && parsed.progress) state.progress = parsed.progress;
-        }
-      } catch(e) {
-        console.warn('Progress load failed, starting fresh', e);
-        localStorage.removeItem('englishApp_v1');
-      }
-    }
-
-    function saveProgress() {
-      localStorage.setItem('englishApp_v1', JSON.stringify({ version: 1, progress: state.progress }));
-    }
-
-    function starsHtml(n, max=3) {
-      let s = '';
-      for (let i = 0; i < max; i++) s += i < n ? '★' : '☆';
-      return s;
-    }
-
-    // ===================== CONFETTI =====================
-
-    function showCelebrationModal(stars, score, total) {
-      const starStr = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-      const msgs = {
-        3: 'מעולה! אתה כוכב! 🌟',
-        2: 'יפה מאוד! כמעט מושלם! 🎉',
-        1: 'כל הכבוד! המשך להתאמן! 💪',
-        0: 'נסה שוב — אתה יכול! 😊'
-      };
-      const msg = msgs[stars] || msgs[0];
-
-      const overlay = document.createElement('div');
-      overlay.className = 'celebration-overlay';
-      overlay.setAttribute('data-action', 'closeCelebration');
-      overlay.innerHTML = `
-        <div class="celebration-modal" onclick="event.stopPropagation()">
-          <h2>סיימת! 🎊</h2>
-          <div class="celebration-stars">${starStr}</div>
-          <p class="celebration-msg">${msg}</p>
-          <p style="color:rgba(255,255,255,0.6);margin-bottom:16px;font-size:0.95rem">${score} / ${total} תשובות נכונות</p>
-          <button class="btn btn-primary" style="width:100%" onclick="this.closest('.celebration-overlay').remove()">המשך ✨</button>
-        </div>`;
-      document.getElementById('app').appendChild(overlay);
-    }
-
-    function showConfetti() {
-      const container = document.createElement('div');
-      container.className = 'confetti-container';
-      const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff6bff','#ff9f43','#a29bfe'];
-      for (let i = 0; i < 55; i++) {
-        const p = document.createElement('div');
-        p.className = 'confetti-piece';
-        p.style.cssText = `left:${Math.random()*100}%;background:${colors[i%colors.length]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-delay:${Math.random()*1.5}s;animation-duration:${2.5+Math.random()*2}s`;
-        container.appendChild(p);
-      }
-      document.body.appendChild(container);
-      setTimeout(() => container.remove(), 5000);
-    }
-
-    // ===================== GAME SETUP =====================
-
-    function buildMatchQuestions(unit) {
-      if (unit.mode === 'reading') return [];
-      const words = unit.words;
-      const shuffled = shuffle(words);
-      return shuffled.map(word => {
-        const wrong = shuffle(words.filter(w => w !== word)).slice(0, 3);
-        const opts = shuffle([word, ...wrong]);
-        return { word, opts };
-      });
-    }
-
-    function buildQuizQuestions(unit) {
-      if (unit.mode === 'reading') return [];
-      const words = unit.words;
-      const shuffled = shuffle(words);
-      return shuffled.map(word => {
-        if ((unit.mode === 'heToEn') && word.en.length >= 3) {
-          const letters = word.en.toUpperCase().split('');
-          const hideIdx = Math.floor(Math.random() * letters.length);
-          const correctLetter = letters[hideIdx];
-          const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-          const wrongLetters = shuffle(allLetters.filter(l => l !== correctLetter)).slice(0, 3);
-          const letterOpts = shuffle([correctLetter, ...wrongLetters]);
-          return { type: 'letter', word, hideIdx, correctLetter, letterOpts };
-        } else {
-          const wrong = shuffle(words.filter(w => w !== word)).slice(0, 3);
-          const opts = shuffle([word, ...wrong]);
-          return { type: 'sentence', word, opts };
-        }
-      });
-    }
-
-    // ===================== RENDER =====================
-
-    function render() {
-      const app = document.getElementById('app');
-      const theme = state.level === 'beginner' ? 'theme-beginner' : 'theme-advanced';
-      document.body.style.background = state.level === 'beginner' ? '#4a1060' : '#4a0a1a';
-
-      let html = '';
-      if (state.screen === 'home') {
-        html = renderHome(theme);
-      } else if (state.screen === 'unit') {
-        html = renderUnit(theme);
-      } else if (state.screen === 'alphabet') {
-        html = renderAlphabet(theme);
-      }
-      app.innerHTML = html;
-    }
-
-    function renderHome(theme) {
-      const units = getUnits();
-      let totalStars = 0;
-      let totalPossible = 0;
-      units.forEach(u => {
-        const p = getProgress(u.id);
-        totalStars += p.stars;
-        totalPossible += 3;
-      });
-
-      const unitCards = units.map(u => {
-        const p = getProgress(u.id);
-        const pct = ((p.matchDone ? 1 : 0) + (p.quizDone ? 1 : 0) + (p.stars > 0 ? 1 : 0)) / 3 * 100;
-        const complete = p.stars === 3 && p.matchDone && p.quizDone;
-        return `
-          <div class="unit-card" data-action="openUnit" data-unit-id="${u.id}">
-            ${complete ? '<div class="unit-check">✓</div>' : ''}
-            <div class="unit-emoji">${u.emoji}</div>
-            <div class="unit-title">${u.title}</div>
-            <div class="unit-stars" style="color:#ffd700">${starsHtml(p.stars)}</div>
-            <div class="unit-progress">
-              <div class="unit-progress-fill" style="width:${pct}%"></div>
-            </div>
-          </div>`;
-      }).join('');
-
-      return `
-        <div class="${theme}">
-          <div class="home-header">
-            <h1>🌟 לומדים אנגלית!</h1>
-            <div class="level-toggle">
-              <button class="btn ${state.level === 'beginner' ? 'btn-active' : 'btn-secondary'}" data-action="setLevel" data-level="beginner">🌱 מתחילים</button>
-              <button class="btn ${state.level === 'advanced' ? 'btn-active' : 'btn-secondary'}" data-action="setLevel" data-level="advanced">🚀 מתקדמים</button>
-            </div>
-          </div>
-          <div class="alphabet-btn-wrap">
-            <button class="btn btn-secondary" data-action="openAlphabet">🔤 האלפבית האנגלי</button>
-          </div>
-          <div class="units-grid">
-            ${unitCards}
-          </div>
-          <div class="total-stars-bar">
-            ⭐ ${totalStars} / ${totalPossible} כוכבים
-          </div>
-          <div class="reset-btn-wrap">
-            <button class="reset-btn" data-action="resetProgress">🗑️ איפוס התקדמות</button>
-          </div>
-        </div>`;
-    }
-
-    function renderUnit(theme) {
-      const unit = getUnit(state.unitId);
-      if (!unit) return '';
-
-      const tabs = unit.mode === 'reading'
-        ? [['learn','📖 קריאה'],['quiz','❓ שאלות']]
-        : [['learn','📚 למידה'],['match','🎯 התאמה'],['quiz','✏️ חידון']];
-
-      const tabBar = tabs.map(([id, label]) =>
-        `<button class="tab-btn ${state.tab === id ? 'active' : ''}" data-action="setTab" data-tab="${id}">${label}</button>`
-      ).join('');
-
-      let content = '';
-      if (state.tab === 'learn') content = renderLearn(unit);
-      else if (state.tab === 'match') content = renderMatch(unit);
-      else if (state.tab === 'quiz') content = renderQuiz(unit);
-
-      return `
-        <div class="${theme}">
-          <div class="unit-header">
-            <button class="back-btn" data-action="goHome">← חזרה</button>
-            <h2>${unit.emoji} ${unit.title}</h2>
-          </div>
-          <div class="tab-bar">${tabBar}</div>
-          ${content}
-        </div>`;
-    }
-
-    function renderLearn(unit) {
-      if (unit.mode === 'reading') {
-        const passages = unit.passages || [];
-        const idx = state.readingPassage || 0;
-        const passage = passages[idx];
-        if (!passage) return '<p style="text-align:center;padding:20px">אין קטעי קריאה</p>';
-
-        const selectorBtns = passages.map((p, i) =>
-          `<button class="passage-btn ${i === idx ? 'active' : ''}" data-action="selectPassage" data-idx="${i}">${p.title}</button>`
-        ).join('');
-
-        return `
-          <div>
-            <div class="passage-selector">${selectorBtns}</div>
-            <div class="reading-passage">
-              <div class="reading-title">${passage.title}</div>
-              <div class="reading-text">${passage.text}</div>
-            </div>
-          </div>`;
-      }
-
-      const words = unit.words;
-      const idx = state.cardIndex;
-      const word = words[idx];
-      const dots = words.map((_, i) =>
-        `<div class="dot ${i === idx ? 'active' : ''}"></div>`
-      ).join('');
-
-      return `
-        <div>
-          <div class="flashcard">
-            <div class="card-emoji">${word.e}</div>
-            <div class="card-en" dir="ltr">${word.en}</div>
-            ${word.t ? `<div class="card-translit" dir="ltr">/${word.t}/</div>` : ''}
-            ${state.cardFlipped
-              ? `<div class="card-he">${word.he}</div>
-                 <button class="speak-btn" data-action="speakWord" data-text="${word.en}">🔊 הקשב</button>`
-              : `<button class="flip-btn" data-action="flipCard">הצג תרגום</button>`
-            }
-          </div>
-          <div class="nav-row">
-            <button class="nav-btn" data-action="prevCard" ${idx === 0 ? 'disabled' : ''}>←</button>
-            <div class="dots">${dots}</div>
-            <button class="nav-btn" data-action="nextCard" ${idx === words.length - 1 ? 'disabled' : ''}>→</button>
-          </div>
-          <p style="text-align:center;color:rgba(255,255,255,0.5);font-size:0.85rem;margin-top:8px">${idx+1} / ${words.length}</p>
-        </div>`;
-    }
-
-    function renderMatch(unit) {
-      if (state.matchDone) {
-        const score = state.matchScore;
-        const total = state.matchQuestions.length;
-        const pct = score / total;
-        const stars = pct === 1 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
-        const msgs = ['נסה שוב 💪','כמעט! 👍','יופי! 🎉','מושלם! 🌟'];
-        return `
-          <div class="results-screen">
-            <h2>🎯 סיום התאמה!</h2>
-            <div class="result-stars" style="color:#ffd700">${starsHtml(stars)}</div>
-            <div class="result-score">${score} / ${total} נכון</div>
-            <div class="result-message">${msgs[stars]}</div>
-            <div class="result-btns">
-              <button class="btn btn-secondary" data-action="setTab" data-tab="match">שחק שוב</button>
-              <button class="btn btn-primary" data-action="setTab" data-tab="quiz">לחידון ✏️</button>
-            </div>
-          </div>`;
-      }
-
-      const q = state.matchQuestions[state.matchQ];
-      if (!q) return '';
-      const total = state.matchQuestions.length;
-
-      let prompt = '';
-      let optDir = 'ltr';
-      if (unit.mode === 'heToEn') {
-        prompt = `<div class="match-prompt">${q.word.e}</div><div class="match-he">${q.word.he}</div>`;
-        optDir = 'ltr';
-      } else {
-        prompt = `<div class="match-prompt">${q.word.e}</div><div class="match-en" dir="ltr">${q.word.en}</div>`;
-        optDir = 'rtl';
-      }
-
-      const opts = q.opts.map((opt, i) => {
-        const label = unit.mode === 'heToEn' ? opt.en : opt.he;
-        return `<button class="option-btn" dir="${optDir}" data-action="matchAnswer" data-idx="${i}">${label}</button>`;
-      }).join('');
-
-      return `
-        <div>
-          <div class="match-progress">שאלה ${state.matchQ + 1} / ${total}</div>
-          <div class="match-score">✅ ${state.matchScore} נכון</div>
-          <div class="match-question">
-            ${prompt}
-            <div class="options-grid">${opts}</div>
-          </div>
-        </div>`;
-    }
-
-    function renderQuiz(unit) {
-      if (unit.mode === 'reading') {
-        return renderReadingQuiz(unit);
-      }
-
-      if (state.quizDone) {
-        const score = state.quizScore;
-        const total = state.quizQuestions.length;
-        const pct = score / total;
-        const stars = pct === 1 ? 3 : pct >= 0.75 ? 2 : pct >= 0.5 ? 1 : 0;
-        const msgs = ['נסה שוב 💪','יפה! 👍','כל הכבוד! 🎉','מושלם! 🌟'];
-        return `
-          <div class="results-screen">
-            <h2>✏️ סיום חידון!</h2>
-            <div class="result-stars" style="color:#ffd700">${starsHtml(stars)}</div>
-            <div class="result-score">${score} / ${total} נכון</div>
-            <div class="result-message">${msgs[stars]}</div>
-            <div class="result-btns">
-              <button class="btn btn-secondary" data-action="setTab" data-tab="quiz">שחק שוב</button>
-              <button class="btn btn-primary" data-action="goHome">🏠 בחר יחידה</button>
-            </div>
-          </div>`;
-      }
-
-      const q = state.quizQuestions[state.quizQ];
-      if (!q) return '';
-      const total = state.quizQuestions.length;
-
-      if (q.type === 'letter') {
-        const letters = q.word.en.toUpperCase().split('');
-        const display = letters.map((l, i) =>
-          i === q.hideIdx ? '<span style="color:#ffd700;border-bottom:3px solid #ffd700;min-width:24px;display:inline-block;text-align:center">_</span>' : l
-        ).join('');
-        const opts = q.letterOpts.map((l, i) =>
-          `<button class="letter-option" data-action="quizAnswer" data-idx="${i}">${l}</button>`
-        ).join('');
-        return `
-          <div>
-            <div class="match-progress">שאלה ${state.quizQ + 1} / ${total}</div>
-            <div class="match-score">✅ ${state.quizScore} נכון</div>
-            <div class="quiz-word-display">
-              <div class="quiz-prompt-he">${q.word.he}</div>
-              <div class="card-emoji">${q.word.e}</div>
-              <div class="quiz-word" dir="ltr">${display}</div>
-              <p style="color:rgba(255,255,255,0.5);font-size:0.85rem">השלם את האות החסרה</p>
-            </div>
-            <div class="quiz-letters">${opts}</div>
-          </div>`;
-      } else {
-        const isEnToHe = unit.mode === 'enToHe';
-        const questionText = isEnToHe ? q.word.en : q.word.he;
-        const questionDir = isEnToHe ? 'ltr' : 'rtl';
-        const opts = q.opts.map((opt, i) => {
-          const label = isEnToHe ? opt.he : opt.en;
-          const dir = isEnToHe ? 'rtl' : 'ltr';
-          return `<button class="quiz-sentence-opt" dir="${dir}" data-action="quizAnswer" data-idx="${i}">${label}</button>`;
-        }).join('');
-        return `
-          <div>
-            <div class="match-progress">שאלה ${state.quizQ + 1} / ${total}</div>
-            <div class="match-score">✅ ${state.quizScore} נכון</div>
-            <div class="quiz-word-display">
-              <div class="card-emoji">${q.word.e}</div>
-              <div style="font-size:1.4rem;margin:12px 0;color:#ffd700" dir="${questionDir}">${questionText}</div>
-              <p style="color:rgba(255,255,255,0.5);font-size:0.85rem">${isEnToHe ? 'מה התרגום לעברית?' : 'מה התרגום לאנגלית?'}</p>
-            </div>
-            <div class="quiz-sentence-options">${opts}</div>
-          </div>`;
-      }
-    }
-
-    function renderReadingQuiz(unit) {
-      const passages = unit.passages || [];
-      const pIdx = state.readingPassage || 0;
-      const passage = passages[pIdx];
-      if (!passage) return '<p style="text-align:center;padding:20px">אין שאלות</p>';
-
-      const allQs = [];
-      passages.forEach((p, pi) => {
-        p.questions.forEach((q, qi) => allQs.push({ ...q, pi, qi, passageTitle: p.title }));
-      });
-
-      if (state.readingDone) {
-        const score = state.readingScore;
-        const total = allQs.length;
-        const pct = score / total;
-        const stars = pct === 1 ? 3 : pct >= 0.67 ? 2 : pct >= 0.33 ? 1 : 0;
-        const msgs = ['נסה שוב 💪','יפה! 👍','כל הכבוד! 🎉','מושלם! 🌟'];
-        return `
-          <div class="results-screen">
-            <h2>📖 סיום קריאה!</h2>
-            <div class="result-stars" style="color:#ffd700">${starsHtml(stars)}</div>
-            <div class="result-score">${score} / ${total} נכון</div>
-            <div class="result-message">${msgs[stars]}</div>
-            <div class="result-btns">
-              <button class="btn btn-secondary" data-action="resetReading">שחק שוב</button>
-              <button class="btn btn-primary" data-action="goHome">🏠 בחר יחידה</button>
-            </div>
-          </div>`;
-      }
-
-      const qIdx = state.readingQ || 0;
-      const q = allQs[qIdx];
-      if (!q) return '';
-
-      const selectorBtns = passages.map((p, i) =>
-        `<button class="passage-btn ${i === pIdx ? 'active' : ''}" data-action="selectPassage" data-idx="${i}">${p.title}</button>`
-      ).join('');
-
-      const opts = q.opts.map((opt, i) => {
-        const cls = state.readingAnswered
-          ? (i === q.correct ? 'correct' : (i === state.readingSelected ? 'wrong' : ''))
-          : '';
-        return `<button class="quiz-sentence-opt ${cls}" data-action="readingAnswer" data-idx="${i}">${opt}</button>`;
-      }).join('');
-
-      return `
-        <div>
-          <div class="passage-selector">${selectorBtns}</div>
-          <div class="reading-passage">
-            <div class="reading-title">${passages[q.pi].title}</div>
-            <div class="reading-text">${passages[q.pi].text}</div>
-          </div>
-          <div class="match-progress">שאלה ${qIdx + 1} / ${allQs.length}</div>
-          <div class="match-score">✅ ${state.readingScore} נכון</div>
-          <div class="reading-question">${q.q}</div>
-          <div class="quiz-sentence-options">${opts}</div>
-        </div>`;
-    }
-
-    function renderAlphabet(theme) {
-      const cards = alphabet.map(item => `
-        <div class="letter-card ${vowels.has(item.l) ? 'vowel' : ''}" data-action="sayLetter" data-letter="${item.l}" data-word="${item.w}">
-          <div class="big-letter">${item.l}</div>
-          <div class="letter-emoji">${item.e}</div>
-          <div class="letter-word">${item.w}</div>
-          <div class="letter-translit">${item.t}</div>
-        </div>`
-      ).join('');
-
-      return `
-        <div class="${theme}">
-          <div class="alphabet-header">
-            <button class="back-btn" data-action="goHome">← חזרה</button>
-            <h2>🔤 האלפבית האנגלי</h2>
-          </div>
-          <p style="text-align:center;color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:12px">לחץ על אות כדי לשמוע אותה</p>
-          <div class="alphabet-grid">${cards}</div>
-        </div>`;
-    }
-
-    // ===================== HANDLE ACTION =====================
-
-    function handleAction(action, data, e) {
-      switch(action) {
-        case 'setLevel':
-          state.level = data.level;
-          document.body.className = 'theme-' + state.level;
-          render();
-          break;
-
-        case 'openUnit': {
-          const unit = getUnits().find(u => u.id === data.unitId);
-          if (!unit) return;
-          state.unitId = data.unitId;
-          state.tab = 'learn';
-          state.cardIndex = 0;
-          state.cardFlipped = false;
-          state.matchQuestions = buildMatchQuestions(unit);
-          state.matchQ = 0; state.matchScore = 0; state.matchDone = false;
-          state.quizQuestions = buildQuizQuestions(unit);
-          state.quizQ = 0; state.quizScore = 0; state.quizDone = false;
-          state.readingPassage = 0; state.readingQ = 0; state.readingScore = 0;
-          state.readingDone = false; state.readingAnswered = false;
-          state.screen = 'unit';
-          render();
-          break;
-        }
-
-        case 'openAlphabet':
-          state.screen = 'alphabet';
-          render();
-          break;
-
-        case 'goHome':
-          state.screen = 'home';
-          render();
-          break;
-
-        case 'setTab':
-          state.tab = data.tab;
-          if (data.tab === 'match') {
-            const u = getUnit(state.unitId);
-            state.matchQuestions = buildMatchQuestions(u);
-            state.matchQ = 0; state.matchScore = 0; state.matchDone = false;
-          }
-          if (data.tab === 'quiz') {
-            const u = getUnit(state.unitId);
-            state.quizQuestions = buildQuizQuestions(u);
-            state.quizQ = 0; state.quizScore = 0; state.quizDone = false;
-            state.readingQ = 0; state.readingScore = 0; state.readingDone = false; state.readingAnswered = false;
-          }
-          render();
-          break;
-
-        case 'nextCard':
-          state.cardIndex++;
-          state.cardFlipped = false;
-          render();
-          break;
-
-        case 'prevCard':
-          state.cardIndex--;
-          state.cardFlipped = false;
-          render();
-          break;
-
-        case 'flipCard': {
-          state.cardFlipped = true;
-          const w = getUnit(state.unitId).words[state.cardIndex];
-          speak(w.en);
-          render();
-          break;
-        }
-
-        case 'speakWord':
-          speak(data.text);
-          break;
-
-        case 'matchAnswer':
-          handleMatchAnswer(parseInt(data.idx));
-          break;
-
-        case 'quizAnswer':
-          handleQuizAnswer(parseInt(data.idx));
-          break;
-
-        case 'readingAnswer':
-          handleReadingAnswer(parseInt(data.idx));
-          break;
-
-        case 'resetReading':
-          state.readingQ = 0; state.readingScore = 0; state.readingDone = false; state.readingAnswered = false;
-          render();
-          break;
-
-        case 'sayLetter': {
-          const card = e.target.closest('.letter-card');
-          if (card) {
-            card.classList.add('pulse-anim');
-            setTimeout(() => card.classList.remove('pulse-anim'), 400);
-          }
-          const u1 = new SpeechSynthesisUtterance(data.letter);
-          u1.lang = 'en-US'; u1.rate = 0.8;
-          speechSynthesis.cancel();
-          speechSynthesis.speak(u1);
-          setTimeout(() => {
-            const u2 = new SpeechSynthesisUtterance(data.word);
-            u2.lang = 'en-US'; u2.rate = 0.8;
-            speechSynthesis.speak(u2);
-          }, 900);
-          break;
-        }
-
-        case 'selectPassage':
-          state.readingPassage = parseInt(data.idx);
-          render();
-          break;
-
-        case 'resetProgress':
-          if (confirm('למחוק את כל ההתקדמות?')) {
-            localStorage.removeItem('englishApp_v1');
-            state.progress = {};
-            state.screen = 'home';
-            render();
-          }
-          break;
-      }
-    }
-
-    function handleMatchAnswer(idx) {
-      const q = state.matchQuestions[state.matchQ];
-      const chosen = q.opts[idx];
-      const isCorrect = chosen === q.word;
-      if (isCorrect) state.matchScore++;
-
-      const app = document.getElementById('app');
-      const buttons = app.querySelectorAll('.option-btn');
-      buttons.forEach((btn, i) => {
-        btn.disabled = true;
-        if (q.opts[i] === q.word) btn.classList.add('correct');
-        else if (i === idx) btn.classList.add('wrong');
-      });
-
-      setTimeout(() => {
-        state.matchQ++;
-        if (state.matchQ >= state.matchQuestions.length) {
-          state.matchDone = true;
-          updateProgress(state.unitId, 'matchDone', true);
-        }
-        render();
-      }, 900);
-    }
-
-    function handleQuizAnswer(idx) {
-      const q = state.quizQuestions[state.quizQ];
-      const app = document.getElementById('app');
-      let isCorrect = false;
-
-      if (q.type === 'letter') {
-        const chosen = q.letterOpts[idx];
-        isCorrect = chosen === q.correctLetter;
-        const buttons = app.querySelectorAll('.letter-option');
-        buttons.forEach((btn, i) => {
-          btn.disabled = true;
-          if (q.letterOpts[i] === q.correctLetter) btn.classList.add('correct');
-          else if (i === idx) btn.classList.add('wrong');
-        });
-      } else {
-        const chosen = q.opts[idx];
-        isCorrect = chosen === q.word;
-        const buttons = app.querySelectorAll('.quiz-sentence-opt');
-        buttons.forEach((btn, i) => {
-          btn.disabled = true;
-          if (q.opts[i] === q.word) btn.classList.add('correct');
-          else if (i === idx) btn.classList.add('wrong');
-        });
-      }
-
-      if (isCorrect) state.quizScore++;
-
-      setTimeout(() => {
-        state.quizQ++;
-        if (state.quizQ >= state.quizQuestions.length) {
-          state.quizDone = true;
-          const pct = state.quizScore / state.quizQuestions.length;
-          const stars = pct === 1 ? 3 : pct >= 0.75 ? 2 : pct >= 0.5 ? 1 : 0;
-          updateProgress(state.unitId, 'quizDone', true);
-          updateProgress(state.unitId, 'stars', stars);
-          if (stars > 0) setTimeout(showConfetti, 300);
-          setTimeout(() => showCelebrationModal(stars, state.quizScore, state.quizQuestions.length), 600);
-        }
-        render();
-      }, 900);
-    }
-
-    function handleReadingAnswer(idx) {
-      if (state.readingAnswered) return;
-      const passages = getUnit(state.unitId).passages || [];
-      const allQs = [];
-      passages.forEach((p, pi) => {
-        p.questions.forEach((q, qi) => allQs.push({ ...q, pi, qi }));
-      });
-      const q = allQs[state.readingQ];
-      if (!q) return;
-
-      state.readingAnswered = true;
-      state.readingSelected = idx;
-
-      const isCorrect = idx === q.correct;
-      if (isCorrect) state.readingScore++;
-
-      const app = document.getElementById('app');
-      const buttons = app.querySelectorAll('.quiz-sentence-opt');
-      buttons.forEach((btn, i) => {
-        btn.disabled = true;
-        if (i === q.correct) btn.classList.add('correct');
-        else if (i === idx) btn.classList.add('wrong');
-      });
-
-      setTimeout(() => {
-        state.readingQ++;
-        state.readingAnswered = false;
-        if (state.readingQ >= allQs.length) {
-          state.readingDone = true;
-          const pct = state.readingScore / allQs.length;
-          const stars = pct === 1 ? 3 : pct >= 0.67 ? 2 : pct >= 0.33 ? 1 : 0;
-          updateProgress(state.unitId, 'quizDone', true);
-          updateProgress(state.unitId, 'stars', stars);
-          if (stars > 0) setTimeout(showConfetti, 300);
-          setTimeout(() => showCelebrationModal(stars, state.readingScore, allQs.length), 600);
-        }
-        render();
-      }, 900);
-    }
-
-    // ===================== INIT =====================
-
-    loadProgress();
-    document.body.className = 'theme-' + state.level;
+    <div class="opts-grid">${optBtns}</div>
+  </div>`;
+}
+
+function renderReadingQuiz(unit){
+  const psg=unit.passages[state.readPsg]||unit.passages[0];
+  if(state.readDone){
+    const stars=state.readScore===psg.questions.length?3:state.readScore>=Math.ceil(psg.questions.length*0.67)?2:state.readScore>0?1:0;
+    return`<div class="results">
+      <div class="res-stars">${starsStr(stars)}</div>
+      <div class="res-score">${state.readScore} / ${psg.questions.length} נכון</div>
+      <div class="res-msg">${stars===3?'מצוין! 🎉':stars>=2?'יפה מאוד! 👍':'נסה שוב 💪'}</div>
+      <div class="res-btns">
+        <button class="btn btn-secondary" data-action="startReading">נסה שוב 🔄</button>
+      </div>
+    </div>`;
+  }
+  if(state.readQ<0){
+    const btns=unit.passages.map((p,i)=>`<button class="psg-btn${state.readPsg===i?' active':''}" data-action="selectPassage" data-idx="${i}">${p.title}</button>`).join('');
+    return`<div>
+      <div class="reading-passages">${btns}</div>
+      <div class="psg-box"><div class="psg-title">${psg.title}</div><div class="psg-text">${psg.text}</div></div>
+      <div style="text-align:center;margin-top:16px"><button class="btn btn-primary" data-action="startReading">התחל שאלות ▶</button></div>
+    </div>`;
+  }
+  const q=psg.questions[state.readQ];
+  const opts=q.opts.map((o,i)=>`<button class="ropt" data-action="readingAnswer" data-idx="${i}" dir="ltr">${o}</button>`).join('');
+  return`<div>
+    <div class="match-prog">${state.readQ+1} / ${psg.questions.length}</div>
+    <div class="rq-prompt">${q.q}</div>
+    <div class="rq-opts">${opts}</div>
+  </div>`;
+}
+
+function renderQuiz(unit){
+  if(unit.mode==='reading')return renderReadingQuiz(unit);
+  if(state.quizDone){
+    const pct=state.quizScore/state.quizQs.length;
+    const stars=pct===1?3:pct>=0.75?2:pct>=0.5?1:0;
+    return`<div class="results">
+      <div class="res-stars" style="font-size:3.5rem">${starsStr(stars)}</div>
+      <div class="res-score">${state.quizScore} / ${state.quizQs.length} נכון</div>
+      <div class="res-msg">${stars===3?'מושלם! 🎉🏆':stars>=2?'כל הכבוד! 💪':stars===1?'כמעט! תמשיך לתרגל 📚':'נסה שוב! 💡'}</div>
+      <div class="res-btns">
+        <button class="btn btn-secondary" data-action="setTab" data-tab="quiz">נסה שוב 🔄</button>
+        <button class="btn btn-white" data-action="goHome">לדף הבית 🏠</button>
+      </div>
+    </div>`;
+  }
+  const q=state.quizQs[state.quizQ];
+  if(!q)return'';
+  let body='';
+  if(q.type==='letter'){
+    const lets=q.word.en.toUpperCase().split('').map((l,i)=>i===q.hideIdx?'_':l).join(' ');
+    const lopts=q.letterOpts.map((l,i)=>`<button class="lopt" data-action="quizAnswer" data-idx="${i}">${l}</button>`).join('');
+    body=`<div class="quiz-word">${lets}</div>
+      <div style="color:rgba(255,255,255,.5);font-size:.85rem;margin-bottom:8px">${q.word.he}</div>
+      <div class="quiz-letters">${lopts}</div>`;
+  }else{
+    const sopts=q.opts.map((o,i)=>`<button class="sopt" data-action="quizAnswer" data-idx="${i}" dir="ltr">${o.en}</button>`).join('');
+    body=`<div class="quiz-prompt-he">${q.word.he}</div>
+      <div class="sent-opts">${sopts}</div>`;
+  }
+  return`<div class="quiz-wrap">
+    <div class="quiz-prog">${state.quizQ+1} / ${state.quizQs.length}</div>
+    ${body}
+  </div>`;
+}
+
+function renderAlphabet(){
+  const cards=alphabet.map(a=>`
+    <div class="lcard${vowels.has(a.l)?' vowel':''}" data-action="sayLetter" data-letter="${a.l}" data-word="${a.w}">
+      <div class="big-l">${a.l}/${a.l.toLowerCase()}</div>
+      <div class="l-emoji">${a.e}</div>
+      <div class="l-word">${a.w}</div>
+      <div class="l-tr">${a.t}</div>
+    </div>`).join('');
+  return`<div style="min-height:100vh;background:#1a0030;padding:12px 0">
+    <div class="alpha-hdr">
+      <button class="back-btn" data-action="goHome">← חזרה</button>
+      <h2>🔤 האלפבית האנגלי</h2>
+    </div>
+    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:.8rem;margin-bottom:12px">אותיות בצהוב = תנועות</div>
+    <div class="alpha-grid">${cards}</div>
+  </div>`;
+}
+
+// ============ ACTIONS ============
+document.getElementById('app').addEventListener('click',e=>{
+  const el=e.target.closest('[data-action]');
+  if(!el)return;
+  const d=el.dataset;
+  handleAction(d.action,d,el,e);
+});
+
+function handleAction(action,d,el,e){
+  switch(action){
+    case'setLevel':
+      state.level=d.level;render();break;
+    case'openUnit':{
+      const unit=getUnits().find(u=>u.id===d.unitId);
+      state.unitId=d.unitId;state.tab='learn';
+      state.cardIndex=0;state.cardFlipped=false;
+      state.matchQs=buildMatchQs(unit);state.matchQ=0;state.matchScore=0;state.matchDone=false;
+      state.quizQs=buildQuizQs(unit);state.quizQ=0;state.quizScore=0;state.quizDone=false;
+      state.readPsg=0;state.readQ=-1;state.readScore=0;state.readDone=false;
+      state.screen='unit';render();break;}
+    case'openAlphabet':state.screen='alphabet';render();break;
+    case'goHome':state.screen='home';render();break;
+    case'setTab':
+      state.tab=d.tab;
+      if(d.tab==='match'){const u=getUnit(state.unitId);state.matchQs=buildMatchQs(u);state.matchQ=0;state.matchScore=0;state.matchDone=false;}
+      if(d.tab==='quiz'){const u=getUnit(state.unitId);state.quizQs=buildQuizQs(u);state.quizQ=0;state.quizScore=0;state.quizDone=false;}
+      if(d.tab==='learn'){state.cardIndex=0;state.cardFlipped=false;}
+      render();break;
+    case'nextCard':state.cardIndex++;state.cardFlipped=false;render();break;
+    case'prevCard':state.cardIndex--;state.cardFlipped=false;render();break;
+    case'flipCard':{
+      state.cardFlipped=true;
+      const w=getUnit(state.unitId).words[state.cardIndex];
+      speak(w.en);render();break;}
+    case'speakWord':speak(d.text);break;
+    case'matchAnswer':handleMatchAnswer(parseInt(d.idx));break;
+    case'quizAnswer':handleQuizAnswer(parseInt(d.idx));break;
+    case'sayLetter':{
+      if(el.closest('.lcard')){el.closest('.lcard').classList.add('pulsing');setTimeout(()=>el.closest('.lcard').classList.remove('pulsing'),400)}
+      const u1=new SpeechSynthesisUtterance(d.letter);u1.lang='en-US';u1.rate=0.8;
+      speechSynthesis.cancel();speechSynthesis.speak(u1);
+      setTimeout(()=>{const u2=new SpeechSynthesisUtterance(d.word);u2.lang='en-US';u2.rate=0.8;speechSynthesis.speak(u2);},900);
+      break;}
+    case'resetProgress':
+      if(confirm('למחוק את כל ההתקדמות? לא ניתן לשחזר.'))
+        {localStorage.removeItem('englishApp_v1');state.progress={};state.screen='home';render();}
+      break;
+    case'selectPassage':
+      state.readPsg=parseInt(d.idx);state.readQ=-1;state.readScore=0;state.readDone=false;render();break;
+    case'startReading':
+      state.readQ=0;state.readScore=0;state.readDone=false;render();break;
+    case'readingAnswer':handleReadingAnswer(parseInt(d.idx));break;
+  }
+}
+
+function handleMatchAnswer(idx){
+  const q=state.matchQs[state.matchQ];
+  const isCorrect=q.opts[idx]===q.word;
+  if(isCorrect)state.matchScore++;
+  const btns=document.querySelectorAll('.opt-btn');
+  btns.forEach((b,i)=>{
+    b.disabled=true;
+    if(q.opts[i]===q.word)b.classList.add('correct');
+    else if(i===idx)b.classList.add('wrong');
+  });
+  setTimeout(()=>{
+    state.matchQ++;
+    if(state.matchQ>=state.matchQs.length){state.matchDone=true;setProg(state.unitId,'matchDone',true);}
     render();
+  },900);
+}
 
-    document.getElementById('app').addEventListener('click', e => {
-      const el = e.target.closest('[data-action]');
-      if (!el) return;
-      const d = el.dataset;
-      handleAction(d.action, d, e);
-    });
-  </script>
+function handleQuizAnswer(idx){
+  const q=state.quizQs[state.quizQ];
+  let isCorrect=false;
+  if(q.type==='letter'){
+    isCorrect=q.letterOpts[idx]===q.correctLetter;
+    const btns=document.querySelectorAll('.lopt');
+    btns.forEach((b,i)=>{b.disabled=true;if(q.letterOpts[i]===q.correctLetter)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');});
+  }else{
+    isCorrect=q.opts[idx]===q.word;
+    const btns=document.querySelectorAll('.sopt');
+    btns.forEach((b,i)=>{b.disabled=true;if(q.opts[i]===q.word)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');});
+  }
+  if(isCorrect)state.quizScore++;
+  setTimeout(()=>{
+    state.quizQ++;
+    if(state.quizQ>=state.quizQs.length){
+      state.quizDone=true;
+      const pct=state.quizScore/state.quizQs.length;
+      const stars=pct===1?3:pct>=0.75?2:pct>=0.5?1:0;
+      setProg(state.unitId,'quizDone',true);
+      setProg(state.unitId,'stars',stars);
+      if(stars>0)setTimeout(confetti,300);
+    }
+    render();
+  },900);
+}
+
+function handleReadingAnswer(idx){
+  const unit=getUnit(state.unitId);
+  const psg=unit.passages[state.readPsg];
+  const q=psg.questions[state.readQ];
+  const isCorrect=idx===q.correct;
+  if(isCorrect)state.readScore++;
+  const btns=document.querySelectorAll('.ropt');
+  btns.forEach((b,i)=>{b.disabled=true;if(i===q.correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');});
+  setTimeout(()=>{
+    state.readQ++;
+    if(state.readQ>=psg.questions.length){
+      state.readDone=true;
+      const stars=state.readScore===psg.questions.length?3:state.readScore>=Math.ceil(psg.questions.length*0.67)?2:state.readScore>0?1:0;
+      setProg(state.unitId,'quizDone',true);
+      setProg(state.unitId,'stars',stars);
+      if(stars>0)setTimeout(confetti,300);
+    }
+    render();
+  },900);
+}
+
+// ============ INIT ============
+
+// ===== PWA: Inline Service Worker =====
+(function() {
+  if (!('serviceWorker' in navigator)) return;
+  const swCode = `
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open('app-v1').then(c => c.addAll([location.href]))
+  );
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request))
+  );
+});
+  `;
+  const blob = new Blob([swCode], {type:'text/javascript'});
+  const url = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).catch(()=>{});
+})();
+
+// ===== iOS Safari Fixes =====
+// Safe AudioContext init
+let audioCtx = null;
+function initAudio() {
+  if (audioCtx) return;
+  try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+}
+document.addEventListener('touchstart', initAudio, {once:true, passive:true});
+document.addEventListener('click', initAudio, {once:true});
+
+load();render();
+</script>
 </body>
 </html>
