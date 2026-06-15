@@ -9,13 +9,12 @@
 - Accessibility and progressive enhancement
 - Gamification mechanics and progress tracking
 - Cross-browser compatibility (no build step)
-- Clean DOM manipulation without framework overhead
 
 ---
 
-## Assigned Agents for This Project
+## Working with Agents
 
-To load an agent's full persona and instructions:
+To load any agent's full definition:
 ```
 mcp__github__get_file_contents(
   owner="ofergertz",
@@ -24,29 +23,40 @@ mcp__github__get_file_contents(
 )
 ```
 
-### Primary Agents
-| Role | Agent | Load with |
-|------|-------|-----------|
-| Developer | `dev-js-1` | `agents/dev-js-1.md` |
-| Reviewer | `reviewer-js-1` | `agents/reviewer-js-1.md` |
-| Domain Expert | `education-expert` | `agents/education-expert.md` |
-
-### Support Agents (available on request)
-| Agent | File | When to use |
-|-------|------|-------------|
-| `super-agent` | `agents/super-agent.md` | Overall orchestration |
-| `tech-lead` | `agents/tech-lead.md` | Task breakdown, standards |
-| `architect` | `agents/architect.md` | Architecture decisions |
-| `qa` | `agents/qa.md` | Testing strategy |
-| `devops` | `agents/devops.md` | Deployment |
-| `ux-ui-designer` | `agents/ux-ui-designer.md` | UI/UX design |
-| `analytics-agent` | `agents/analytics-agent.md` | User progress tracking |
-| `performance-agent` | `agents/performance-agent.md` | Load time, runtime perf |
-| `security-agent` | `agents/security-agent.md` | Security reviews |
-| `documentation-agent` | `agents/documentation-agent.md` | README, docs updates |
-| `business-analyst` | `agents/business-analyst.md` | Feature requirements |
+**Start every task by loading the Tech Lead:**
+```
+agents/tech-lead.md
+```
+The Tech Lead reads the task, decides which agents are needed, and assigns the work.
 
 ---
 
-## Agent Registry
-Full team reference: `github.com/ofergertz/ai-team-agents`
+## Fixed Project Assignments
+
+These are structural (don't change per-task), provided to the Tech Lead as context:
+
+| Role | Agent |
+|------|-------|
+| Developer | `dev-js-1` |
+| Reviewer | `reviewer-js-1` |
+
+---
+
+## Full Agent Roster
+
+The Tech Lead chooses from these based on the task:
+
+| Agent | File | Specialty |
+|-------|------|-----------|
+| `super-agent` | `super-agent.md` | Master orchestrator |
+| `tech-lead` | `tech-lead.md` | Task orchestration — **load first** |
+| `architect` | `architect.md` | Architecture decisions |
+| `qa` | `qa.md` | Testing strategy |
+| `devops` | `devops.md` | Deployment |
+| `education-expert` | `education-expert.md` | Pedagogy, learning design |
+| `ux-ui-designer` | `ux-ui-designer.md` | UI/UX design |
+| `analytics-agent` | `analytics-agent.md` | Progress tracking, KPIs |
+| `performance-agent` | `performance-agent.md` | Load time, runtime perf |
+| `security-agent` | `security-agent.md` | Security reviews |
+| `documentation-agent` | `documentation-agent.md` | README, docs |
+| `business-analyst` | `business-analyst.md` | Feature requirements |
