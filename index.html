@@ -122,6 +122,13 @@ body{font-family:Arial,sans-serif;min-height:100vh;background:#1a0030;color:#fff
 .ropt:hover:not(:disabled){background:rgba(255,255,255,.2)}
 .ropt.correct{background:#388e3c!important;border-color:#388e3c!important}
 .ropt.wrong{background:#c62828!important;border-color:#c62828!important;animation:shake .3s}
+/* STORIES */
+.story-img{display:block;width:100%;max-height:260px;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.08);margin-bottom:12px}
+.story-box{background:rgba(255,255,255,.1);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.story-line{direction:ltr;text-align:left;font-size:1rem;line-height:1.6;margin:4px 0}
+.story-speaker{font-weight:700;color:#ffd700}
+.story-hint{background:rgba(255,215,0,.15);border-radius:10px;padding:10px 14px;margin:10px 0 0;font-size:1rem}
+.story-subtitle{text-align:center;font-size:.72rem;color:rgba(255,255,255,.5);margin-top:4px}
 /* CONFETTI */
 .cbox{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
 .cp{position:absolute;width:9px;height:9px;border-radius:2px;animation:fall linear forwards}
@@ -369,6 +376,224 @@ const alphabet=[
 ];
 const vowels=new Set(['A','E','I','O','U']);
 
+// ============ READING STORIES ============
+// 5 free characters x 3 categories (easy/no-questions, 3 questions, 4 harder
+// questions), 5 dialogue segments each. All 5 characters are free - no
+// paywall exists in this app and none is added here (issue #2).
+// Content is verbatim from content/stories/draft-all-15.md (gated upstream
+// by hebrew-linguist + education-expert) - do not edit text here, edit the
+// source markdown and re-copy.
+const storyCharacters=[
+  {id:'pluma',he:'פלומה',emoji:'🐱',companion:'Robin'},
+  {id:'vered',he:'ורד',emoji:'🐰',companion:'Hedgehog'},
+  {id:'dubi',he:'דובי',emoji:'🐻',companion:'Robin'},
+  {id:'barvazon',he:'ברוזון',emoji:'🐥',companion:'Frog'},
+  {id:'noa',he:'נועה',emoji:'👸',companion:'Robin'}
+];
+const storyCategories=[
+  {id:'cat1',he:'קל - בלי שאלות',emoji:'🌱'},
+  {id:'cat2',he:'בינוני - 3 שאלות',emoji:'⭐'},
+  {id:'cat3',he:'מתקדם - 4 שאלות',emoji:'🏆'}
+];
+// Only pluma/cat3 segments 1-4 were generated as .webp; every other image is
+// .png (75 images total, all 5 characters x 3 categories x 5 segments).
+function storyImgSrc(charId,cat,segNum){
+  const ext=(charId==='pluma'&&cat==='cat3'&&segNum<=4)?'webp':'png';
+  return`content/stories/${charId}/${cat}/img/seg${segNum}.${ext}`;
+}
+
+const stories={
+  pluma:{
+    cat1:{title:'Pluma and Robin Play',segments:[
+      [{s:'Pluma',t:'Hi! I am Pluma.'},{s:'Pluma',t:'I am a little white cat.'}],
+      [{s:'Pluma',t:'I like milk.'},{s:'Robin',t:'Hello, Pluma! I am your friend.'}],
+      [{s:'Pluma',t:"Let's play together!"},{s:'Robin',t:'Yes! I love to play.'}],
+      [{s:'Pluma',t:'I see a red ball.'},{s:'Robin',t:"Let's chase it!"}],
+      [{s:'Pluma',t:'That was so much fun!'},{s:'Robin',t:'You are a great friend, Pluma.'}]
+    ]},
+    cat2:{title:'Pluma and the Lost Yarn',segments:[
+      [{s:'Pluma',t:'Good morning! I am Pluma, a little white kitten.'},{s:'Pluma',t:'I love to play with my red yarn.'}],
+      [{s:'Pluma',t:'Oh no! My red yarn is gone!'},{s:'Pluma',t:'Where did it go?'}],
+      [{s:'Robin',t:'Hi Pluma! What happened?'},{s:'Pluma',t:'I lost my yarn ball.'},{s:'Robin',t:"Don't worry, I will help you look."}],
+      [{s:'Robin',t:'I see something red under the sofa!'},{s:'Pluma',t:"That's my yarn! Thank you, Robin!"}],
+      [{s:'Pluma',t:'You are a wonderful friend.'},{s:'Robin',t:'Friends always help each other.'}]
+    ],questions:[
+      {q:'What did Pluma lose?',hintHe:'מה פלומה איבדה?'},
+      {q:'Who helped Pluma find it?',hintHe:'מי עזר לפלומה למצוא אותו?'},
+      {q:'Where was the yarn hiding?',hintHe:'איפה החוט הסתתר?'}
+    ]},
+    cat3:{title:'Pluma Learns to Ask for Help',segments:[
+      [{s:'Pluma',t:'Hello! I am Pluma. I live in a cozy house.'},{s:'Pluma',t:'Today I want to find a new toy in the garden.'}],
+      [{s:'Pluma',t:'I am looking everywhere, but I cannot find anything fun.'},{s:'Pluma',t:'This is harder than I thought.'}],
+      [{s:'Robin',t:"Hi Pluma! You look a little sad. What's wrong?"},{s:'Pluma',t:"I can't find anything fun to play with."},{s:'Robin',t:'Maybe we can look together!'}],
+      [{s:'Robin',t:'Look! I found a shiny bell under the leaves!'},{s:'Pluma',t:"Wow, that's perfect! Thank you for helping me."}],
+      [{s:'Pluma',t:'I learned something today.'},{s:'Pluma',t:"It's okay to ask a friend for help."},{s:'Robin',t:"That's what friends are for!"}]
+    ],questions:[
+      {q:'What was Pluma looking for?',hintHe:'מה פלומה חיפשה?'},
+      {q:'Why did Pluma feel sad?',hintHe:'למה פלומה הרגישה עצובה?'},
+      {q:'Who helped Pluma search?',hintHe:'מי עזר לפלומה לחפש?'},
+      {q:'What did Pluma learn at the end?',hintHe:'מה פלומה למדה בסוף?'}
+    ]}
+  },
+  vered:{
+    cat1:{title:'Vered Loves the Garden',segments:[
+      [{s:'Vered',t:'Hi! I am Vered.'},{s:'Vered',t:'I am a little pink bunny.'}],
+      [{s:'Vered',t:'I love carrots.'},{s:'Hedgehog',t:'Hello, Vered! I am your friend.'}],
+      [{s:'Vered',t:"Let's hop in the garden!"},{s:'Hedgehog',t:'Yes! I love to hop too.'}],
+      [{s:'Vered',t:'Look at the pretty flowers!'},{s:'Hedgehog',t:'They smell so sweet.'}],
+      [{s:'Vered',t:'Today was a wonderful day.'},{s:'Hedgehog',t:'You are a great friend, Vered.'}]
+    ]},
+    cat2:{title:'Vered Plants a Seed',segments:[
+      [{s:'Vered',t:'Good morning! I am Vered.'},{s:'Vered',t:'Today I want to plant a seed in the garden.'}],
+      [{s:'Vered',t:'I dig a little hole and put the seed inside.'},{s:'Vered',t:'Now I will water it every day.'}],
+      [{s:'Hedgehog',t:'Hi Vered! What are you doing?'},{s:'Vered',t:'I am growing a flower!'},{s:'Hedgehog',t:'That sounds exciting!'}],
+      [{s:'Vered',t:'Look! A little green leaf is growing!'},{s:'Hedgehog',t:'Wow, your seed became a plant!'}],
+      [{s:'Vered',t:'I am so happy and proud.'},{s:'Hedgehog',t:'Great job, Vered!'}]
+    ],questions:[
+      {q:'What did Vered plant?',hintHe:'מה וֶרֶד שתלה?'},
+      {q:'What did Vered do every day?',hintHe:'מה וֶרֶד עשתה כל יום?'},
+      {q:'What grew from the seed?',hintHe:'מה צמח מהזרע?'}
+    ]},
+    cat3:{title:'Vered and the Jumping Day',segments:[
+      [{s:'Vered',t:'Hello! Today the forest has a Jumping Day.'},{s:'Vered',t:'I want to jump over the big wooden bar.'}],
+      [{s:'Vered',t:'But I am smaller than the other rabbits.'},{s:'Vered',t:'I feel a little scared.'}],
+      [{s:'Hedgehog',t:"Hi Vered! Let's practice jumping together every day."},{s:'Vered',t:"That's a great idea! Thank you, Hedgehog."}],
+      [{s:'Vered',t:'The big day is here. I am ready!'},{s:'Vered',t:'I run, I jump, and I did it!'}],
+      [{s:'Hedgehog',t:'You jumped higher than ever before!'},{s:'Vered',t:'Practicing with a friend made me stronger.'}]
+    ],questions:[
+      {q:'What event was happening in the forest?',hintHe:'איזה אירוע התקיים ביער?'},
+      {q:'Why did Vered feel scared at first?',hintHe:'למה וֶרֶד פחדה בהתחלה?'},
+      {q:'How did Vered prepare for the big day?',hintHe:'איך וֶרֶד התכוננה ליום הגדול?'},
+      {q:'What did Vered learn by the end?',hintHe:'מה וֶרֶד למדה בסוף?'}
+    ]}
+  },
+  dubi:{
+    cat1:{title:'Dubi Finds Honey',segments:[
+      [{s:'Dubi',t:'Hi! I am Dubi.'},{s:'Dubi',t:'I am a little brown bear.'}],
+      [{s:'Dubi',t:'I love honey.'},{s:'Robin',t:'Hello, Dubi! I am your friend.'}],
+      [{s:'Dubi',t:"Let's walk to the forest!"},{s:'Robin',t:'Yes! I know a good spot.'}],
+      [{s:'Dubi',t:'Look, a honey pot!'},{s:'Robin',t:"Yummy! Let's share it."}],
+      [{s:'Dubi',t:'Today was a sweet day.'},{s:'Robin',t:'You are a great friend, Dubi.'}]
+    ]},
+    cat2:{title:'Dubi Gathers Nuts',segments:[
+      [{s:'Dubi',t:'Good morning! I am Dubi, a little brown bear.'},{s:'Dubi',t:'It is autumn, and I need to gather nuts for winter.'}],
+      [{s:'Dubi',t:'I find one nut near a low branch.'},{s:'Dubi',t:'I put it carefully in my basket.'}],
+      [{s:'Robin',t:'Hi Dubi! What are you doing?'},{s:'Dubi',t:'I am collecting nuts for winter.'},{s:'Robin',t:'I will help you look for more!'}],
+      [{s:'Dubi',t:'My basket is full now!'},{s:'Robin',t:'Great job, Dubi! Winter will be warm and cozy.'}],
+      [{s:'Dubi',t:'Thank you for helping me, Robin.'},{s:'Robin',t:"That's what friends are for."}]
+    ],questions:[
+      {q:'What season is it in the story?',hintHe:'איזו עונה מתוארת בסיפור?'},
+      {q:'What did Dubi collect?',hintHe:'מה דֻּבִּי אסף?'},
+      {q:'Who helped Dubi gather nuts?',hintHe:'מי עזר לדֻּבִּי לאסוף אגוזים?'}
+    ]},
+    cat3:{title:'Dubi and the Tall Tree',segments:[
+      [{s:'Dubi',t:'Hello! I love honey more than anything.'},{s:'Dubi',t:'Today I see a big beehive high in a tree.'}],
+      [{s:'Dubi',t:'I try to climb, but the branch is too thin.'},{s:'Dubi',t:'I feel scared and climb back down.'}],
+      [{s:'Robin',t:'Hi Dubi! You look upset. What happened?'},{s:'Dubi',t:'I could not reach the honey.'},{s:'Robin',t:"Don't worry, I can fly up and bring some down!"}],
+      [{s:'Robin',t:'Here is a little piece of honey for you!'},{s:'Dubi',t:'Thank you so much, Robin! You are amazing.'}],
+      [{s:'Dubi',t:'We shared the honey together, and it was wonderful.'},{s:'Dubi',t:"I learned that it's okay to ask for help sometimes."}]
+    ],questions:[
+      {q:'What did Dubi want to reach?',hintHe:'למה דֻּבִּי רצה להגיע?'},
+      {q:'Why did Dubi climb back down?',hintHe:'למה דֻּבִּי ירד בחזרה?'},
+      {q:'How did Robin help Dubi?',hintHe:'איך רוֹבִּין עזרה לדֻּבִּי?'},
+      {q:'What did Dubi learn at the end?',hintHe:'מה דֻּבִּי למד בסוף?'}
+    ]}
+  },
+  barvazon:{
+    cat1:{title:'Barvazon Swims in the Pond',segments:[
+      [{s:'Barvazon',t:'Hi! I am Barvazon.'},{s:'Barvazon',t:'I am a little yellow duckling.'}],
+      [{s:'Barvazon',t:'I love to swim.'},{s:'Frog',t:'Hello, Barvazon! I am your friend.'}],
+      [{s:'Barvazon',t:"Let's swim in the pond!"},{s:'Frog',t:'Yes! I love the water too.'}],
+      [{s:'Barvazon',t:'Look at the lily pads!'},{s:'Frog',t:'They are so green and pretty.'}],
+      [{s:'Barvazon',t:'Today was a splashy, happy day.'},{s:'Frog',t:'You are a great friend, Barvazon.'}]
+    ]},
+    cat2:{title:'Barvazon Finds a Feather',segments:[
+      [{s:'Barvazon',t:'Good morning! I am Barvazon, a little yellow duckling.'},{s:'Barvazon',t:'I am swimming in the garden pond.'}],
+      [{s:'Barvazon',t:'I see something white floating on the water!'},{s:'Barvazon',t:'What could it be?'}],
+      [{s:'Frog',t:'Hi Barvazon! I am a frog who lives here.'},{s:'Barvazon',t:'Nice to meet you! Look, a white feather!'},{s:'Frog',t:"Let's play together near the water."}],
+      [{s:'Barvazon',t:'We dive and float and laugh together.'},{s:'Frog',t:'This is so much fun!'}],
+      [{s:'Barvazon',t:'I found a new friend today.'},{s:'Frog',t:"Let's play again tomorrow!"}]
+    ],questions:[
+      {q:'What did Barvazon see floating on the water?',hintHe:'מה בַּרְוָזוֹן ראה צף על המים?'},
+      {q:'Who did Barvazon meet at the pond?',hintHe:'את מי בַּרְוָזוֹן פגש בברכה?'},
+      {q:'What did they promise to do tomorrow?',hintHe:'על מה הם הבטיחו לחזור מחר?'}
+    ]},
+    cat3:{title:'Barvazon Learns to Float',segments:[
+      [{s:'Barvazon',t:'Hello! Today I see a big lake past the garden fence.'},{s:'Barvazon',t:'I am curious to swim in deep water.'}],
+      [{s:'Barvazon',t:'I go in slowly, but the water is too deep for me.'},{s:'Barvazon',t:'I feel scared and swim back to my small pond.'}],
+      [{s:'Frog',t:'Hi Barvazon! You look upset. What happened?'},{s:'Barvazon',t:'I could not float in the deep water.'},{s:'Frog',t:'Let me teach you to float slowly, step by step.'}],
+      [{s:'Barvazon',t:'I breathe deeply and try again in the shallow water.'},{s:'Barvazon',t:'This time, I am floating! I did it!'}],
+      [{s:'Frog',t:'You tried again, and now you can float!'},{s:'Barvazon',t:'If you try again, you can succeed.'}]
+    ],questions:[
+      {q:'Where did Barvazon want to swim?',hintHe:'איפה בַּרְוָזוֹן רצה לשחות?'},
+      {q:'Why did Barvazon swim back to the small pond?',hintHe:'למה בַּרְוָזוֹן חזר לברכה הקטנה?'},
+      {q:'Who taught Barvazon to float?',hintHe:'מי לימדה את בַּרְוָזוֹן לצוף?'},
+      {q:'What did Barvazon learn by the end?',hintHe:'מה בַּרְוָזוֹן למד בסוף?'}
+    ]}
+  },
+  noa:{
+    cat1:{title:'Noa in the Garden',segments:[
+      [{s:'Noa',t:'Hi! I am Noa.'},{s:'Noa',t:'I am a little princess.'}],
+      [{s:'Noa',t:'I love flowers and stars.'},{s:'Robin',t:'Hello, Noa! I am your friend.'}],
+      [{s:'Noa',t:"Let's walk in the garden!"},{s:'Robin',t:'Yes! I love the garden too.'}],
+      [{s:'Noa',t:'Look at this beautiful red rose!'},{s:'Robin',t:'It smells so sweet.'}],
+      [{s:'Noa',t:'Today was a lovely day.'},{s:'Robin',t:'You are a great friend, Noa.'}]
+    ]},
+    cat2:{title:'Noa Helps a Bird',segments:[
+      [{s:'Noa',t:'Good morning! I am Noa, a little princess.'},{s:'Noa',t:'I am walking in the palace garden.'}],
+      [{s:'Noa',t:'I hear a soft chirping behind a bush.'},{s:'Noa',t:'I find a small bird with a hurt wing.'}],
+      [{s:'Noa',t:"Hello little bird, don't be afraid."},{s:'Noa',t:'I will make you a soft nest and bring you water.'}],
+      [{s:'Noa',t:'Every day I bring the bird food and water.'},{s:'Noa',t:'Slowly, the bird gets better and stronger.'}],
+      [{s:'Robin',t:'Thank you for helping me, Noa!'},{s:'Noa',t:'I am so happy you can fly again.'}]
+    ],questions:[
+      {q:'What did Noa find behind the bush?',hintHe:'מה נוֹעָה מצאה מאחורי השיח?'},
+      {q:'What did Noa build for the bird?',hintHe:'מה נוֹעָה בנתה לציפור?'},
+      {q:'What happened to the bird over time?',hintHe:'מה קרה לציפור במשך הזמן?'}
+    ]},
+    cat3:{title:'Noa Sings at the Garden Party',segments:[
+      [{s:'Noa',t:'Hello! Every spring there is a garden party at the palace.'},{s:'Noa',t:'I want to sing a song I wrote myself.'}],
+      [{s:'Noa',t:'But when I think about all the people watching, I feel scared.'},{s:'Noa',t:'What if I forget the words?'}],
+      [{s:'Robin',t:"Hi Noa! Let's practice singing in the garden every day."},{s:'Noa',t:"That's a wonderful idea! Thank you, Robin."}],
+      [{s:'Noa',t:'The party day is here, and I stand in front of everyone.'},{s:'Noa',t:'I take a deep breath and sing my song clearly.'}],
+      [{s:'Robin',t:'Everyone is clapping! You did it, Noa!'},{s:'Noa',t:'Practicing turned my fear into confidence.'}]
+    ],questions:[
+      {q:'What did Noa want to do at the garden party?',hintHe:'מה נוֹעָה רצתה לעשות במסיבת הגינה?'},
+      {q:'Why did Noa feel scared?',hintHe:'למה נוֹעָה הרגישה פחד?'},
+      {q:'How did Noa prepare for the party?',hintHe:'איך נוֹעָה התכוננה למסיבה?'},
+      {q:'What did Noa learn by the end?',hintHe:'מה נוֹעָה למדה בסוף?'}
+    ]}
+  }
+};
+
+// ---- Reading metrics: identity-blind, best-effort local counters ----
+// This app has no backend and no analytics infra of any kind (static
+// nginx container, zero dependencies - see README.md/Dockerfile). There is
+// nothing to "wire up" honestly beyond a local, aggregate-only counter:
+// no per-child id, no timestamp tied to a session, nothing ever leaves the
+// device. Counts are opens-per-character, opens-per-category and
+// questions-answered-per-category - exactly what the issue asks for, in the
+// only form this app can honestly provide today.
+//
+// TODO(analytics-agent / future backend): if this app ever gets a real
+// events endpoint, mirror trackStoryEvent's payload to it (e.g. POST
+// /api/events) instead of only aggregating in localStorage, and keep this
+// function as the single call site so nothing needs to change at the call
+// sites below.
+function trackStoryEvent(name,payload){
+  try{
+    const raw=localStorage.getItem('englishApp_storyMetrics_v1');
+    const m=(raw?JSON.parse(raw):null)||{storyOpened:{},categoryOpened:{},questionAnswered:{}};
+    if(!m.storyOpened)m.storyOpened={};
+    if(!m.categoryOpened)m.categoryOpened={};
+    if(!m.questionAnswered)m.questionAnswered={};
+    const bump=(obj,key)=>{obj[key]=(obj[key]||0)+1};
+    if(name==='story_opened')bump(m.storyOpened,payload.character);
+    else if(name==='category_opened')bump(m.categoryOpened,`${payload.character}:${payload.category}`);
+    else if(name==='question_answered')bump(m.questionAnswered,`${payload.character}:${payload.category}`);
+    localStorage.setItem('englishApp_storyMetrics_v1',JSON.stringify(m));
+  }catch(e){/* best-effort only - never block the reading experience */}
+}
+
 // ============ STATE ============
 let state={
   screen:'home',level:'beginner',unitId:null,
@@ -376,6 +601,7 @@ let state={
   matchQs:[],matchQ:0,matchScore:0,matchDone:false,
   quizQs:[],quizQ:0,quizScore:0,quizDone:false,
   readPsg:0,readQ:-1,readScore:0,readDone:false,
+  storyChar:null,storyCat:null,storySeg:0,storyQIndex:-1,storyShowHint:false,
   progress:{}
 };
 
@@ -428,6 +654,9 @@ function render(){
   if(state.screen==='home')app.innerHTML=renderHome();
   else if(state.screen==='unit')app.innerHTML=renderUnit();
   else if(state.screen==='alphabet')app.innerHTML=renderAlphabet();
+  else if(state.screen==='storiesHome')app.innerHTML=renderStoriesHome();
+  else if(state.screen==='storyCategory')app.innerHTML=renderStoryCategory();
+  else if(state.screen==='storyReader')app.innerHTML=renderStoryReader();
 }
 
 function renderHome(){
@@ -455,6 +684,7 @@ function renderHome(){
     </div>
     <div style="text-align:center;margin:8px 0 14px">
       <button class="abc-btn" data-action="openAlphabet">🔤 אלפבית</button>
+      <button class="abc-btn" data-action="openStories">📖 סיפורי קריאה</button>
     </div>
     <div class="units-grid">${cards}</div>
     <div class="total-bar">⭐ סה"כ: ${totalStars} כוכבים</div>
@@ -633,6 +863,100 @@ function renderAlphabet(){
   </div>`;
 }
 
+function renderStoriesHome(){
+  const cards=storyCharacters.map(c=>`
+    <div class="ucard" data-action="openStoryChar" data-char="${c.id}">
+      <div class="ucard-emoji">${c.emoji}</div>
+      <div class="ucard-title">${c.he}</div>
+    </div>`).join('');
+  return`<div class="home">
+    <div class="unit-hdr">
+      <button class="back-btn" data-action="goHome">← חזרה</button>
+      <h2>📖 סיפורי קריאה באנגלית</h2>
+    </div>
+    <div style="text-align:center;color:rgba(255,255,255,.6);font-size:.85rem;margin:4px 0 14px">בחרו דמות לקריאה - כולן פתוחות וחינמיות</div>
+    <div class="units-grid">${cards}</div>
+  </div>`;
+}
+
+function renderStoryCategory(){
+  const char=storyCharacters.find(c=>c.id===state.storyChar);
+  if(!char)return renderStoriesHome();
+  const cards=storyCategories.map(cat=>{
+    const s=stories[char.id][cat.id];
+    return`<div class="ucard" data-action="openStoryCat" data-cat="${cat.id}">
+      <div class="ucard-emoji">${cat.emoji}</div>
+      <div class="ucard-title">${cat.he}</div>
+      <div class="story-subtitle" dir="ltr">${s.title}</div>
+    </div>`;
+  }).join('');
+  return`<div class="home">
+    <div class="unit-hdr">
+      <button class="back-btn" data-action="openStories">← חזרה</button>
+      <h2>${char.emoji} ${char.he}</h2>
+    </div>
+    <div class="units-grid">${cards}</div>
+  </div>`;
+}
+
+function renderStoryReader(){
+  const char=storyCharacters.find(c=>c.id===state.storyChar);
+  if(!char)return renderStoriesHome();
+  const cat=state.storyCat;
+  const story=stories[char.id][cat];
+  if(!story)return renderStoryCategory();
+  if(state.storyQIndex>=0)return renderStoryQuestions(char,cat,story);
+  const seg=story.segments[state.storySeg];
+  const imgSrc=storyImgSrc(char.id,cat,state.storySeg+1);
+  const lines=seg.map(l=>`<div class="story-line"><span class="story-speaker">${l.s}:</span> ${l.t}</div>`).join('');
+  const isLast=state.storySeg===story.segments.length-1;
+  const hasQuestions=!!(story.questions&&story.questions.length);
+  const dots=story.segments.map((_,i)=>`<div class="dot${i===state.storySeg?' on':''}"></div>`).join('');
+  return`<div class="unit-wrap">
+    <div class="unit-hdr">
+      <button class="back-btn" data-action="backToStoryCategories">← חזרה</button>
+      <h2 dir="ltr" style="text-align:right">${story.title}</h2>
+    </div>
+    <div class="match-prog">${state.storySeg+1} / ${story.segments.length}</div>
+    <img class="story-img" src="${imgSrc}" alt="${story.title} - ${char.he} - segment ${state.storySeg+1}" loading="lazy">
+    <div class="story-box">${lines}</div>
+    <div class="nav-row">
+      <button class="nav-btn" data-action="storyPrevSeg"${state.storySeg===0?' disabled':''}>◄</button>
+      <div class="dots">${dots}</div>
+      ${isLast
+        ?(hasQuestions
+          ?`<button class="btn btn-primary" data-action="startStoryQuestions">לשאלות ❓</button>`
+          :`<button class="btn btn-primary" data-action="backToStoryCategories">סיימתי 🎉</button>`)
+        :`<button class="nav-btn" data-action="storyNextSeg">►</button>`
+      }
+    </div>
+  </div>`;
+}
+
+function renderStoryQuestions(char,cat,story){
+  const qs=story.questions||[];
+  if(state.storyQIndex>=qs.length){
+    return`<div class="results">
+      <div style="font-size:2.5rem">🎉</div>
+      <div class="res-msg">כל הכבוד! סיימתם לקרוא את הסיפור ולענות על השאלות.</div>
+      <div class="res-btns">
+        <button class="btn btn-secondary" data-action="backToStoryCategories">לקטגוריות אחרות</button>
+        <button class="btn btn-white" data-action="goHome">לדף הבית 🏠</button>
+      </div>
+    </div>`;
+  }
+  const q=qs[state.storyQIndex];
+  return`<div class="quiz-wrap">
+    <div class="quiz-prog">${state.storyQIndex+1} / ${qs.length}</div>
+    <div class="rq-prompt" dir="ltr" style="text-align:left">${q.q}</div>
+    ${state.storyShowHint
+      ?`<div class="story-hint">${q.hintHe}</div>`
+      :`<button class="speak-btn" data-action="toggleStoryHint">💡 רמז בעברית</button>`
+    }
+    <div style="margin-top:18px"><button class="btn btn-primary" data-action="nextStoryQuestion">הבנתי, הבא ▶</button></div>
+  </div>`;
+}
+
 // ============ ACTIONS ============
 document.getElementById('app').addEventListener('click',e=>{
   const el=e.target.closest('[data-action]');
@@ -685,6 +1009,24 @@ function handleAction(action,d,el,e){
     case'startReading':
       state.readQ=0;state.readScore=0;state.readDone=false;render();break;
     case'readingAnswer':handleReadingAnswer(parseInt(d.idx));break;
+    case'openStories':state.screen='storiesHome';render();break;
+    case'openStoryChar':
+      state.storyChar=d.char;state.screen='storyCategory';
+      trackStoryEvent('story_opened',{character:d.char});
+      render();break;
+    case'openStoryCat':
+      state.storyCat=d.cat;state.storySeg=0;state.storyQIndex=-1;state.storyShowHint=false;
+      state.screen='storyReader';
+      trackStoryEvent('category_opened',{character:state.storyChar,category:d.cat});
+      render();break;
+    case'backToStoryCategories':state.screen='storyCategory';render();break;
+    case'storyNextSeg':state.storySeg++;render();break;
+    case'storyPrevSeg':state.storySeg--;render();break;
+    case'startStoryQuestions':state.storyQIndex=0;state.storyShowHint=false;render();break;
+    case'toggleStoryHint':state.storyShowHint=true;render();break;
+    case'nextStoryQuestion':
+      trackStoryEvent('question_answered',{character:state.storyChar,category:state.storyCat});
+      state.storyQIndex++;state.storyShowHint=false;render();break;
   }
 }
 
